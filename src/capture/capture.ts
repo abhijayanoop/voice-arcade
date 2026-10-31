@@ -129,7 +129,7 @@ export interface JargonHits {
 export function jargonHits(text: string, terms: string[]): JargonHits {
   const found = terms.filter((term) => {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    return new RegExp(`(?<![A-Za-z0-9_$])${escaped}(?![A-Za-z0-9_$])`).test(text)
+    return new RegExp(`(?:^|[^A-Za-z0-9_$])${escaped}(?![A-Za-z0-9_$])`).test(text)
   })
   return { hits: found, total: terms.length }
 }

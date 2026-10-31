@@ -212,7 +212,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
           <span className="wa-waves" role="timer" aria-label={`${left} seconds left`}>{left}s</span>
         </header>
         <h1 className="wa-heading">{prompt.text}</h1>
-        {snippet && <pre className="wa-code" data-blip-target="snippet"><code>{snippet.code}</code></pre>}
+        {snippet && <pre className="wa-code" tabIndex={0} aria-label="Code to explain"><code>{snippet.code}</code></pre>}
         {isJuggler && <JugglerField running={phase === 'running'} score={score} />}
         {decode && (
           <div className="wa-scenes" data-blip-target="scenes">

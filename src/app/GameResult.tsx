@@ -66,7 +66,8 @@ export function GameResult() {
       }
     }
     if (gameKey === 'snippet' && voiceRound && !voiceRound.typedInstead && typedRound) {
-      say(Number(voiceRound.metrics.extras.jargon_hits) < Number(typedRound.metrics.extras.jargon_hits) ? 'snippet.voice_missed' : 'snippet.voice_kept')
+      const voiceHits = Number(voiceRound.metrics.extras.jargon_hits)
+      say(voiceHits === 0 || voiceHits < Number(typedRound.metrics.extras.jargon_hits) ? 'snippet.voice_missed' : 'snippet.voice_kept')
       return
     }
     if (gameKey === 'rant') {
@@ -191,7 +192,7 @@ export function GameResult() {
                   <span className="wa-label">{label}: {hit.length}/{SNIPPETS[mode].terms.length}</span>
                   <ul className="wa-chips">
                     {SNIPPETS[mode].terms.map((term) => (
-                      <li key={term} className="wa-chip" aria-pressed={hit.includes(term)}>
+                      <li key={term} className={`wa-chip${hit.includes(term) ? ' is-hit' : ''}`}>
                         {term} {hit.includes(term) ? '(hit)' : '(missed)'}
                       </li>
                     ))}
