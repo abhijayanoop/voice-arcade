@@ -18,6 +18,12 @@ const OWNERSHIP = [
   { value: 'not', label: 'Not really' },
 ]
 
+/** Juggler: the catching score and the keyword rubric, which is approximate. */
+function jugglerSummary(typed: RoundMetrics, voice: RoundMetrics): string {
+  const x = (m: RoundMetrics, key: string) => String(m.extras[key])
+  return `Caught ${x(typed, 'caught')} typed, ${x(voice, 'caught')} by voice. Dropped ${x(typed, 'dropped')} typed, ${x(voice, 'dropped')} by voice. Reply covered (place, time, who; approximate, keyword matching): ${x(typed, 'rubric_hits')}/3 typed, ${x(voice, 'rubric_hits')}/3 by voice.`
+}
+
 /** Rant: the ratings and edit effort that were saved, never the text itself. */
 function rantSummary(typed: RoundMetrics, voice: RoundMetrics): string {
   const accuracy = voice.answers.typed_instead ? '' : ` Flow accuracy: ${String(voice.answers.accuracy)}/5.`
@@ -39,12 +45,24 @@ export function GameResult() {
   const typedWpm = gameKey ? run.played(gameKey).typed?.metrics.wpm ?? 0 : 0
   const voiceRound = gameKey ? run.played(gameKey).voice : undefined
   const voiceWpm = voiceRound?.metrics.wpm ?? 0
+  const typedRound = gameKey ? run.played(gameKey).typed : undefined
 
   // Blip reacts to the same comparison the card shows, so its line never contradicts the numbers.
   useEffect(() => {
     if (gameKey === 'decode') {
       say('decode.sent')
       return
+    }
+    if (gameKey === 'juggler' && voiceRound && !voiceRound.typedInstead && typedRound) {
+      // Only the two juggler lines that the catch counts back up; otherwise fall through to the speed reaction below.
+      if (Number(voiceRound.metrics.extras.caught) > Number(typedRound.metrics.extras.caught)) {
+        say('juggler.voice_caught_more')
+        return
+      }
+      if (Number(typedRound.metrics.extras.dropped) >= 3 && Number(voiceRound.metrics.extras.dropped) < Number(typedRound.metrics.extras.dropped)) {
+        say('juggler.dropped_three')
+        return
+      }
     }
     if (gameKey === 'rant') {
       say('rant.sent')
@@ -55,7 +73,7 @@ export function GameResult() {
     if (ratio >= TIE_RATIO) say('result.voice_big_win', { x: ratio.toFixed(1) })
     else if (ratio <= 1 / TIE_RATIO) say('result.typed_win')
     else say('result.close')
-  }, [gameKey, voiceRound, typedWpm, voiceWpm, say])
+  }, [gameKey, voiceRound, typedRound, typedWpm, voiceWpm, say])
 
   if (!def || !def.playable || !status) return <Navigate to="/lobby" replace />
   const played = run.played(def.key)
@@ -82,7 +100,8 @@ export function GameResult() {
   ]
   const isDecode = def.key === 'decode'
   const isRant = def.key === 'rant'
-  const noun = isDecode ? 'description' : isRant ? 'rant' : 'ideas'
+  const isJuggler = def.key === 'juggler'
+  const noun = isDecode ? 'description' : isRant ? 'rant' : isJuggler ? 'reply' : 'ideas'
   const maxWpm = Math.max(typed.metrics.wpm, voice.metrics.wpm, 1)
 
   async function save() {
@@ -121,7 +140,8 @@ export function GameResult() {
           })}
           <p className="wa-note">
             {isRant && rantSummary(typed.metrics, voice.metrics)}
-            {!isDecode && !isRant && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
+            {isJuggler && jugglerSummary(typed.metrics, voice.metrics)}
+            {!isDecode && !isRant && !isJuggler && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
             {isDecode && `Words: ${typed.metrics.words} typed, ${voice.metrics.words} by voice.`}
             {voice.metrics.integrity === 'flagged' && !voice.typedInstead && ' Your voice round looked typed, so it is marked as flagged.'}
           </p>

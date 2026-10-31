@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useBlip, useBlipOnMount, useQuietWhile } from '../blip/BlipProvider'
-import { capture, editDistance, type CaptureMetrics } from '../capture/capture'
+import { capture, editDistance, rubricHits, type CaptureMetrics } from '../capture/capture'
 import { useRoundRecorder } from '../capture/useRoundRecorder'
 import type { DescriptionSubmission, RoundMetrics } from '../api/types'
 import { other } from '../games/modes'
@@ -10,6 +10,7 @@ import { generateSceneSet, seedForMode } from '../scenes/scenes'
 import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
 import { Chip } from '../ui/Chip'
+import { JugglerField, type JugglerScore } from '../ui/JugglerField'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
 import { useSession } from './SessionProvider'
@@ -70,6 +71,9 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   const [sendable, setSendable] = useState<number | null>(null)
   const [accuracy, setAccuracy] = useState<number | null>(null)
   const startedAt = useRef('')
+  // Juggler only: the catching game keeps its score here while the reply is written.
+  const isJuggler = gameKey === 'juggler'
+  const score = useRef<JugglerScore>({ caught: 0, dropped: 0 })
   const { langMix, setLangMix } = run
   const { say } = useBlip()
   useBlipOnMount(mode === 'typed' ? 'round.typed_intro' : 'round.voice_intro')
@@ -166,7 +170,9 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
         ? { edit_chars: captured.editDistance }
         : isRant
           ? { edit_chars: editDistance(raw!.text, text) }
-          : { idea_count: countIdeas(text), edit_chars: captured.editDistance },
+          : isJuggler
+            ? { caught: score.current.caught, dropped: score.current.dropped, rubric_hits: rubricHits(text).hits }
+            : { idea_count: countIdeas(text), edit_chars: captured.editDistance },
     }
     // The description is the one dictated text that is stored, with its scene set and target.
     // A voice step typed instead is left out, so Judges never score typed text as voice.
@@ -198,6 +204,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
           <span className="wa-waves" role="timer" aria-label={`${left} seconds left`}>{left}s</span>
         </header>
         <h1 className="wa-heading">{prompt.text}</h1>
+        {isJuggler && <JugglerField running={phase === 'running'} score={score} />}
         {decode && (
           <div className="wa-scenes" data-blip-target="scenes">
             {decode.set.scenes.map((scene) => (

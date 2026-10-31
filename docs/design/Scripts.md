@@ -38,6 +38,7 @@ Every event Blip reacts to, with its expression, move, target and line variants.
 | `round.pasted` | smug | perch → `answer-input` | "Copy-paste? I'll pretend I didn't see that. I did, though." · "Nice try. Fresh words only." |
 | `juggler.dropped_three` | sad | hop on dock | "The little apples! They had families." · "Hands busy is the whole point. Try voice next round." |
 | `decode.sent` | love | celebrate | "Sent to the judges. Fingers crossed for you." · "Someone out there is about to squint at your words." |
+| `juggler.voice_caught_more` | cheering | celebrate | "Hands free, apples saved. That is the whole point." · "More caught while talking. Your mouse hand says thanks." |
 | `rant.edit` | pointing | perch → `answer-input` | "Rant over. Now make it something you could actually send." · "Steam released. Time for the grown-up edit." |
 | `rant.sent` | cheeky | celebrate | "Rant filed, never sent. Healthy." · "Your words stay in this browser. Only the numbers leave." |
 

@@ -82,6 +82,22 @@ export const GAMES: GameDef[] = [
       voice: { key: 'rant_voice_1', text: 'Rant about a meeting that should have been a message.' },
     },
   },
-  { key: 'juggler', title: 'The juggler', blurb: 'Reply while you catch things', card: 'sage', playable: false },
+  {
+    key: 'juggler',
+    title: 'The juggler',
+    blurb: '60 sec · reply while you catch apples',
+    card: 'sage',
+    playable: true,
+    seconds: 60,
+    inputLabel: 'Your reply to the message',
+    voiceHint: 'Hold your Flow key and say your reply. Your hand stays on the mouse.',
+    emptyNotice: 'That is empty. Reply to the message first.',
+    explainer:
+      'A message arrives and you have to reply to it, while a catching game runs beside the message box. Move the mouse to catch the falling apples; the ones you miss are dropped. A good reply says where, when and who. You play it twice: once typing, once talking to Flow, each with a different message.',
+    prompts: {
+      typed: { key: 'jg_typed_1', text: 'Message: "Dinner is on! Reply and tell me where to meet, what time, and who is coming."' },
+      voice: { key: 'jg_voice_1', text: 'Message: "The team offsite is happening. Tell me where to be, when to arrive, and who is joining."' },
+    },
+  },
   { key: 'snippet', title: 'Explain the snippet', blurb: 'Explain code, count the jargon', card: 'tomato', playable: false },
 ]
