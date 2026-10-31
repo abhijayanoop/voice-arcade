@@ -23,6 +23,7 @@ Read `CONTEXT.md` before naming anything. Read the ADRs in `docs/adr/` before to
 - The Supabase service key lives only in local scripts. The browser bundle holds the public URL and publishable key.
 - `package.json` scripts are the source of truth for commands. Run typecheck and tests before each commit.
 - Always work on a new branch, never directly on `main`. When the work is done and everything is committed, raise a pull request for it.
+- Before merging a ticket's PR, check every acceptance criterion in the ticket against the implementation, and run typecheck, tests and the build. Fix or report anything missing. Once everything is implemented and checked, merge the PR yourself without asking, then delete that ticket's dev branch locally and on the remote, and switch back to an updated `main`. If a criterion cannot be checked or is unmet, do not merge: say what is outstanding.
 
 ## Agent skills
 
