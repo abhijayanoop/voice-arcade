@@ -25,24 +25,24 @@ export function App() {
   return (
     <SessionProvider>
       <BlipProvider>
-      <GameRunProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/name" element={<Guard step="register"><NameScreen /></Guard>} />
-          <Route path="/ready" element={<Guard step="consent"><ReadyPopup /></Guard>} />
-          <Route path="/lobby" element={<Guard step="lobby"><Lobby /></Guard>} />
-          <Route path="/game/:key" element={<Guard step="lobby"><GameIntro /></Guard>} />
-          <Route path="/game/:key/result" element={<Guard step="lobby"><GameResult /></Guard>} />
-          <Route path="/game/:key/:mode" element={<Guard step="lobby"><GameRound /></Guard>} />
-          <Route path="/spike" element={<Spike />} />
-          <Route path="/p/:token" element={<PersonalLink />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <BlipHost />
-      </BrowserRouter>
-      </GameRunProvider>
-    </BlipProvider>
+        <GameRunProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Welcome />} />
+              <Route path="/name" element={<Guard step="register"><NameScreen /></Guard>} />
+              <Route path="/ready" element={<Guard step="consent"><ReadyPopup /></Guard>} />
+              <Route path="/lobby" element={<Guard step="lobby"><Lobby /></Guard>} />
+              <Route path="/game/:key" element={<Guard step="lobby"><GameIntro /></Guard>} />
+              <Route path="/game/:key/result" element={<Guard step="lobby"><GameResult /></Guard>} />
+              <Route path="/game/:key/:mode" element={<Guard step="lobby"><GameRound /></Guard>} />
+              <Route path="/spike" element={<Spike />} />
+              <Route path="/p/:token" element={<PersonalLink />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            <BlipHost />
+          </BrowserRouter>
+        </GameRunProvider>
+      </BlipProvider>
     </SessionProvider>
   )
 }

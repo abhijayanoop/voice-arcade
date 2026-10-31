@@ -73,6 +73,6 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
 @media (max-width: 640px) { .wa-blip, .wa-blip__body { width: 44px; height: 44px; } }
 @media (prefers-reduced-motion: reduce) {
   .wa-blip { transition: none; }
-  .wa-blip__body, .wa-blip__body svg { animation: none; }
+  .wa-blip__body { animation: none; }
   .wa-blip__body svg { animation: blip-face-in 150ms linear; }
 }

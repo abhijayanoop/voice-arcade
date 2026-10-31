@@ -48,6 +48,8 @@ export function BlipHost() {
   const origin = useRef<{ pointer: Point; blip: Point; moved: boolean } | null>(null)
   const root = useRef<HTMLDivElement>(null)
   const pokes = useRef(0)
+  // A drop or a click on Blip is a reaction, not a new step, so it keeps where Blip was dragged to.
+  const keepDrag = useRef(false)
 
   const locate = useCallback(() => {
     const target = targetElement(scene.target)
@@ -56,7 +58,8 @@ export function BlipHost() {
 
   // Each new step takes Blip to its target and ends any drag.
   useLayoutEffect(() => {
-    setDragged(null)
+    if (keepDrag.current) keepDrag.current = false
+    else setDragged(null)
     locate()
   }, [scene.id, locate])
 
@@ -122,11 +125,10 @@ export function BlipHost() {
     origin.current = null
     setDragging(false)
     if (!start) return
+    if (quiet) return
+    keepDrag.current = true
     if (start.moved) {
-      // Say() starts a new step, which would release the drag; keep the spot Blip was dropped on.
-      const spot = dragged
       say('drag.moved')
-      if (spot) requestAnimationFrame(() => setDragged(spot))
       return
     }
     pokes.current += 1

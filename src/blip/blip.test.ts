@@ -69,3 +69,13 @@ describe('say', () => {
     expect(() => blip.say('nope')).toThrow(/nope/)
   })
 })
+
+describe('parseScripts targets', () => {
+  it('only treats a backticked name after the arrow as a target', () => {
+    const table = parseScripts(scriptsMarkdown)
+    expect(table['farewell'].target).toBeNull()
+    expect(table['setup.first_visit'].target).toBeNull()
+    expect(table['session.all_done'].target).toBeNull()
+    expect(table['setup.pick_name'].target).toBe('name-input')
+  })
+})

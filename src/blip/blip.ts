@@ -22,8 +22,6 @@ export interface Said {
 
 export type Vars = Record<string, string | number>
 
-const unwrap = (cell: string) => cell.trim().replace(/^`|`$/g, '')
-
 /** Parses every `| \`event.key\` | face | move → target | "line" · "line" |` row in the Blip scripts. */
 export function parseScripts(markdown: string): ScriptTable {
   const table: ScriptTable = {}
@@ -34,9 +32,9 @@ export function parseScripts(markdown: string): ScriptTable {
     const [movePart, targetPart] = cells[2].split('→')
     const moveWord = movePart.trim().split(/\s+/)[0]
     table[key] = {
-      expression: unwrap(cells[1]) as Expression,
+      expression: cells[1].trim().replace(/^`|`$/g, '') as Expression,
       move: moveWord,
-      target: targetPart ? unwrap(targetPart) : null,
+      target: targetPart?.match(/`([^`]+)`/)?.[1] ?? null,
       lines: [...cells[3].matchAll(/"([^"]+)"/g)].map((m) => m[1]),
     }
   }
