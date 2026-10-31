@@ -362,3 +362,25 @@ describe('the speed race and finishing the arcade', () => {
     expect(back.view().arcadeDone).toBe(true)
   })
 })
+
+describe('a failed finish', () => {
+  it('is retried by submitting the last round again', async () => {
+    const api = createMemoryApi()
+    let failures = 1
+    const flaky = { ...api, finishArcade: async (t: string) => { if (failures-- > 0) throw new Error('offline'); return api.finishArcade(t) } }
+    const session = createSession({ api: flaky })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    for (const game of ['brain_dump', 'decode', 'rant', 'juggler'] as const) {
+      await session.completeRound(game, 'typed', metrics())
+      await session.completeRound(game, 'voice', metrics())
+    }
+    await session.completeRound('snippet', 'typed', metrics())
+
+    await expect(session.completeRound('snippet', 'voice', metrics())).rejects.toThrow('offline')
+    expect(session.view().arcadeDone).toBe(false)
+
+    await session.completeRound('snippet', 'voice', metrics())
+    expect(session.view().arcadeDone).toBe(true)
+  })
+})

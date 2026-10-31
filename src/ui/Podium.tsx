@@ -43,6 +43,7 @@ export function Podium() {
               <div key={STEPS[i].place} className="wa-podium__spot">
                 <Avatar index={entries[i].avatar} />
                 <span className="wa-podium__name">{entries[i].codeName}</span>
+                <span className="wa-note">{entries[i].wpm} wpm</span>
                 <span className="wa-podium__step" style={{ height: STEPS[i].height, background: STEPS[i].color }}>
                   {STEPS[i].place}
                 </span>

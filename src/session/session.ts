@@ -88,6 +88,12 @@ export function createSession({
     })
   }
 
+  async function finishIfDone(playerToken: string) {
+    if (arcadeDone || !GAMES.every(({ key }) => isDone(key))) return
+    await api.finishArcade(playerToken)
+    arcadeDone = true
+  }
+
   return {
     view: () => ({ step, player, registerError, games: games(), arcadeDone, waves: wavesEarned() }),
     token: () => token,
@@ -133,14 +139,12 @@ export function createSession({
     async completeRound(game, mode, metrics, description) {
       if (!token) throw new Error('register before playing')
       const next = games().find((g) => g.status === 'next')
-      if (next?.key !== game) return
+      // A retry after a failed finish lands here: every game is done, so only the finish is left to save.
+      if (next?.key !== game) return finishIfDone(token)
       const modeOrder = mode === firstModes.get(game) ? 1 : 2
       await api.submitRound(token, { ...metrics, game, mode, modeOrder }, description)
       completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
-      if (!arcadeDone && GAMES.every(({ key }) => isDone(key))) {
-        await api.finishArcade(token)
-        arcadeDone = true
-      }
+      await finishIfDone(token)
     },
     leaderboard: () => api.getLeaderboard(),
     async recordAnswers(game, mode, answers) {
