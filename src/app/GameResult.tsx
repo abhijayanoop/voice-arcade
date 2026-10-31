@@ -7,6 +7,7 @@ import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
 import { Chip } from '../ui/Chip'
 import { TIE_RATIO } from '../games/compare'
+import { SNIPPETS } from '../games/snippets'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
 import { useSession } from './SessionProvider'
@@ -64,6 +65,10 @@ export function GameResult() {
         return
       }
     }
+    if (gameKey === 'snippet' && voiceRound && !voiceRound.typedInstead && typedRound) {
+      say(Number(voiceRound.metrics.extras.jargon_hits) < Number(typedRound.metrics.extras.jargon_hits) ? 'snippet.voice_missed' : 'snippet.voice_kept')
+      return
+    }
     if (gameKey === 'rant') {
       say('rant.sent')
       return
@@ -101,7 +106,8 @@ export function GameResult() {
   const isDecode = def.key === 'decode'
   const isRant = def.key === 'rant'
   const isJuggler = def.key === 'juggler'
-  const noun = isDecode ? 'description' : isRant ? 'rant' : isJuggler ? 'reply' : 'ideas'
+  const isSnippet = def.key === 'snippet'
+  const noun = isDecode ? 'description' : isRant ? 'rant' : isJuggler ? 'reply' : isSnippet ? 'explanation' : 'ideas'
   const maxWpm = Math.max(typed.metrics.wpm, voice.metrics.wpm, 1)
 
   async function save() {
@@ -141,7 +147,8 @@ export function GameResult() {
           <p className="wa-note">
             {isRant && rantSummary(typed.metrics, voice.metrics)}
             {isJuggler && jugglerSummary(typed.metrics, voice.metrics)}
-            {!isDecode && !isRant && !isJuggler && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
+            {isSnippet && `Technical terms hit: ${String(typed.metrics.extras.jargon_hits)}/${String(typed.metrics.extras.jargon_total)} typed, ${String(voice.metrics.extras.jargon_hits)}/${String(voice.metrics.extras.jargon_total)} by voice.`}
+            {!isDecode && !isRant && !isJuggler && !isSnippet && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
             {isDecode && `Words: ${typed.metrics.words} typed, ${voice.metrics.words} by voice.`}
             {voice.metrics.integrity === 'flagged' && !voice.typedInstead && ' Your voice round looked typed, so it is marked as flagged.'}
           </p>
@@ -170,6 +177,28 @@ export function GameResult() {
                 )
               })}
             </div>
+          </section>
+        )}
+
+        {isSnippet && (
+          <section className="wa-card" aria-label="Technical terms">
+            <h2 className="wa-heading">Which terms made it</h2>
+            <p className="wa-body">Matches are exact and case-sensitive, so a mangled capital or a near-miss counts as a miss.</p>
+            {rows.map(({ mode, label }) => {
+              const hit = played[mode]!.jargon ?? []
+              return (
+                <div key={mode} className="wa-field">
+                  <span className="wa-label">{label}: {hit.length}/{SNIPPETS[mode].terms.length}</span>
+                  <ul className="wa-chips">
+                    {SNIPPETS[mode].terms.map((term) => (
+                      <li key={term} className="wa-chip" aria-pressed={hit.includes(term)}>
+                        {term} {hit.includes(term) ? '(hit)' : '(missed)'}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            })}
           </section>
         )}
 

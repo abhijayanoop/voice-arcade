@@ -10,6 +10,8 @@ export interface PlayedRound {
   typedInstead: boolean
   /** Decode only: the scene set shown and the target the Player described. */
   scenes?: { setId: string; targetId: string }
+  /** Snippet only: the technical terms found in the explanation. The text itself is not kept. */
+  jargon?: string[]
 }
 
 interface GameRunValue {

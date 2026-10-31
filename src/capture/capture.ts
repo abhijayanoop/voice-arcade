@@ -116,3 +116,20 @@ export function rubricHits(text: string): RubricHits {
   const who = WHO.test(text) || hasName(text)
   return { place, time, who, hits: [place, time, who].filter(Boolean).length }
 }
+
+export interface JargonHits {
+  hits: string[]
+  total: number
+}
+
+/**
+ * Explain the snippet: which of the snippet's technical terms appear in the text.
+ * Exact and case-sensitive, and a term must stand alone (not inside a longer word); each counts once.
+ */
+export function jargonHits(text: string, terms: string[]): JargonHits {
+  const found = terms.filter((term) => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`(?<![A-Za-z0-9_$])${escaped}(?![A-Za-z0-9_$])`).test(text)
+  })
+  return { hits: found, total: terms.length }
+}
