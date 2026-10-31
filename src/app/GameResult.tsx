@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
+import { useBlip } from '../blip/BlipProvider'
 import type { Mode } from '../session/session'
 import { Chip } from '../ui/Chip'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
 import { useSession } from './SessionProvider'
 
+/** Voice and typing within this factor of each other count as a tie. */
+const TIE_RATIO = 1.2
 const NATURAL = ['Very awkward', 'A bit awkward', 'Fine', 'Natural', 'Very natural']
 const OWNERSHIP = [
   { value: 'mine', label: 'Yes, all mine' },
@@ -23,6 +26,21 @@ export function GameResult() {
   const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState(false)
 
+  const { say } = useBlip()
+  const gameKey = def?.key
+  const typedWpm = gameKey ? run.played(gameKey).typed?.metrics.wpm ?? 0 : 0
+  const voiceRound = gameKey ? run.played(gameKey).voice : undefined
+  const voiceWpm = voiceRound?.metrics.wpm ?? 0
+
+  // Blip reacts to the same comparison the card shows, so its line never contradicts the numbers.
+  useEffect(() => {
+    if (!voiceRound || voiceRound.typedInstead || typedWpm === 0 || voiceWpm === 0) return
+    const ratio = voiceWpm / typedWpm
+    if (ratio >= TIE_RATIO) say('result.voice_big_win', { x: ratio.toFixed(1) })
+    else if (ratio <= 1 / TIE_RATIO) say('result.typed_win')
+    else say('result.close')
+  }, [voiceRound, typedWpm, voiceWpm, say])
+
   if (!def || !def.playable || !status) return <Navigate to="/lobby" replace />
   const played = run.played(def.key)
   const typed = played.typed
@@ -36,9 +54,9 @@ export function GameResult() {
       ? 'You typed the voice round, so there is no voice comparison this time.'
       : typed.metrics.wpm === 0 || voice.metrics.wpm === 0
       ? 'One of your rounds has no usable timing, so there is no fair speed comparison this time.'
-      : ratio >= 1.2
+      : ratio >= TIE_RATIO
         ? `Voice was ${ratio.toFixed(1)}× faster than typing.`
-        : ratio <= 1 / 1.2
+        : ratio <= 1 / TIE_RATIO
           ? `Typing was ${(1 / ratio).toFixed(1)}× faster than voice.`
           : 'Basically a tie between typing and voice.'
 

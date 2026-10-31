@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Cohort, Os } from '../api/types'
+import { useBlip, useBlipOnMount } from '../blip/BlipProvider'
 import { AVATARS } from '../ui/avatars'
 import { Chip } from '../ui/Chip'
 import { useSession } from './SessionProvider'
@@ -18,12 +19,17 @@ const SYSTEMS: { value: Os; label: string }[] = [
   { value: 'other', label: 'Other' },
 ]
 
+/** How long the code name cheer stays up before Blip moves on to the avatars. */
+const NAME_LINE_MS = 3000
+
 function pick<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)]
 }
 
 export function NameScreen() {
   const { view, register } = useSession()
+  const { say } = useBlip()
+  useBlipOnMount('setup.pick_name')
   const navigate = useNavigate()
   const suggestions = useMemo(
     () => Array.from({ length: 3 }, () => `${pick(ADJECTIVES)}${pick(NOUNS)}`),
@@ -42,6 +48,23 @@ export function NameScreen() {
   useEffect(() => {
     if (view.step === 'consent') navigate('/ready', { replace: true })
   }, [view.step, navigate])
+
+  // Blip cheers a usable code name once per name, then points at the avatars.
+  const announced = useRef('')
+  const nextStep = useRef(0)
+  function announceName() {
+    if (name.length < 2 || announced.current === name) return
+    announced.current = name
+    say('setup.name_done', { name })
+    window.clearTimeout(nextStep.current)
+    nextStep.current = window.setTimeout(() => say('setup.pick_avatar'), NAME_LINE_MS)
+  }
+  useEffect(() => () => window.clearTimeout(nextStep.current), [])
+
+  function pickAvatar(index: number) {
+    setAvatar(index)
+    if (languages.length === 0) say('setup.languages')
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
@@ -76,6 +99,8 @@ export function NameScreen() {
               autoComplete="off"
               aria-describedby="code-name-help"
               aria-invalid={view.registerError ? true : undefined}
+              data-blip-target="name-input"
+              onBlur={announceName}
               onChange={(e) => setCodeName(e.target.value)}
             />
             <p id="code-name-help" className="wa-note">
@@ -95,7 +120,7 @@ export function NameScreen() {
             </div>
           </div>
 
-          <fieldset className="wa-field">
+          <fieldset className="wa-field" data-blip-target="avatar-grid">
             <legend className="wa-label">Avatar</legend>
             <div className="wa-row">
               {AVATARS.map((a, i) => (
@@ -106,7 +131,7 @@ export function NameScreen() {
                   style={{ background: a.color }}
                   aria-label={a.name}
                   aria-pressed={avatar === i}
-                  onClick={() => setAvatar(i)}
+                  onClick={() => pickAvatar(i)}
                 >
                   <i />
                   <i />
@@ -137,7 +162,7 @@ export function NameScreen() {
             </div>
           </fieldset>
 
-          <fieldset className="wa-field">
+          <fieldset className="wa-field" data-blip-target="language-card">
             <legend className="wa-label">Languages you talk in (pick any)</legend>
             <div className="wa-chips">
               {LANGUAGES.map((language) => (
