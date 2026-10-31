@@ -30,6 +30,9 @@ export function countIdeas(text: string): number {
   return text.split('\n').filter((line) => line.trim() !== '').length
 }
 
+/** Language mixes a Player can pick before a Rant round. */
+export const LANG_MIXES = ['English', 'Hinglish', 'Manglish', 'Hindi', 'Spanish', 'Other mix']
+
 /** The Arcade in unlock order. Adding a game is adding one entry. */
 export const GAMES: GameDef[] = [
   {
@@ -62,7 +65,23 @@ export const GAMES: GameDef[] = [
     explainer:
       'You see four near-identical scenes and one is highlighted. Describe it so an outside Judge could pick it out from the lookalikes. Your description is shown to Judges anonymously. You play it twice: once typing, once talking to Flow, each with a different scene.',
   },
-  { key: 'rant', title: 'Rant to sendable', blurb: 'Vent, then make it sendable', card: 'lavender', playable: false },
+  {
+    key: 'rant',
+    title: 'Rant to sendable',
+    blurb: '90 sec · vent, then make it sendable',
+    card: 'lavender',
+    playable: true,
+    seconds: 90,
+    inputLabel: 'Your rant',
+    voiceHint: 'Hold your Flow key and rant, in whatever language you actually rant in.',
+    emptyNotice: 'That is empty. Write or say something first.',
+    explainer:
+      'Pick the language mix you really rant in. You get ninety seconds to vent about something irritating, then you edit it into something you could actually send. You rate how sendable your rant was and, in the voice round, how accurate Flow was. Your words never leave this browser: only the ratings and numbers are saved. You play it twice: once typing, once talking to Flow.',
+    prompts: {
+      typed: { key: 'rant_typed_1', text: 'Rant about a group chat that never stops buzzing.' },
+      voice: { key: 'rant_voice_1', text: 'Rant about a meeting that should have been a message.' },
+    },
+  },
   { key: 'juggler', title: 'The juggler', blurb: 'Reply while you catch things', card: 'sage', playable: false },
   { key: 'snippet', title: 'Explain the snippet', blurb: 'Explain code, count the jargon', card: 'tomato', playable: false },
 ]

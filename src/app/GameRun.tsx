@@ -15,19 +15,25 @@ export interface PlayedRound {
 interface GameRunValue {
   played(game: GameKey): Partial<Record<Mode, PlayedRound>>
   record(game: GameKey, mode: Mode, round: PlayedRound): void
+  /** Rant only: the language mix picked for the first round, offered again for the second. */
+  langMix: string | null
+  setLangMix(mix: string): void
 }
 
 const GameRunContext = createContext<GameRunValue | null>(null)
 
 export function GameRunProvider({ children }: { children: React.ReactNode }) {
   const [rounds, setRounds] = useState<Partial<Record<GameKey, Partial<Record<Mode, PlayedRound>>>>>({})
+  const [langMix, setLangMix] = useState<string | null>(null)
   const value = useMemo<GameRunValue>(
     () => ({
+      langMix,
+      setLangMix,
       played: (game) => rounds[game] ?? {},
       record: (game, mode, round) =>
         setRounds((current) => ({ ...current, [game]: { ...current[game], [mode]: round } })),
     }),
-    [rounds],
+    [rounds, langMix],
   )
   return <GameRunContext.Provider value={value}>{children}</GameRunContext.Provider>
 }
