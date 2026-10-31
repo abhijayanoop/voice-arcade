@@ -246,3 +246,37 @@ describe('waves', () => {
     expect(after.view().waves).toBe(1)
   })
 })
+
+describe('saving a game round by round', () => {
+  async function inLobby(api = createMemoryApi()) {
+    const session = createSession({ api, random: () => 0.9 }) // voice first
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    return { api, session }
+  }
+
+  it('shows which modes of a game are done, and keeps them across a resume', async () => {
+    const { api, session } = await inLobby()
+    expect(session.view().games[0].doneModes).toEqual([])
+
+    await session.completeRound('brain_dump', 'voice', metrics())
+    expect(session.view().games[0].doneModes).toEqual(['voice'])
+
+    const after = createSession({ api, random: () => 0 })
+    await after.resume(session.token()!)
+    expect(after.view().games[0].doneModes).toEqual(['voice'])
+    expect(after.view().games[0].firstMode).toBe('voice')
+  })
+
+  it('adds the post-game answers to a saved round without touching its metrics', async () => {
+    const { api, session } = await inLobby()
+    await session.completeRound('brain_dump', 'voice', metrics(33))
+    await session.completeRound('brain_dump', 'typed', metrics(21))
+
+    await session.recordAnswers('brain_dump', 'voice', { felt_natural: 4, ownership: 'mine' })
+
+    const voice = api.rounds().find((r) => r.mode === 'voice')!
+    expect(voice.answers).toEqual({ felt_natural: 4, ownership: 'mine' })
+    expect(voice.words).toBe(33)
+  })
+})

@@ -47,6 +47,9 @@ const first = await rpc('submit_round', { p_token: token, p_round: round, p_desc
 const again = await rpc('submit_round', { p_token: token, p_round: round, p_description: null })
 check('round submitted, and a repeat is accepted', !first.error && !again.error, JSON.stringify(first.error ?? again.error))
 
+const answered = await rpc('record_answers', { p_token: token, p_game: 'brain_dump', p_mode: 'voice', p_answers: { felt_natural: 4 } })
+check('answers are recorded on a saved round', !answered.error, JSON.stringify(answered.error))
+
 const state = await rpc('get_state', { p_token: token })
 const s = state.data
 check('state restores the Player', s?.player?.codeName === codeName && s.player.consented === true && s.player.leaderboardOptIn === true, JSON.stringify(state))

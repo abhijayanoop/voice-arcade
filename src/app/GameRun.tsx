@@ -3,9 +3,11 @@ import type { RoundMetrics } from '../api/types'
 import type { GameKey } from '../games/registry'
 import type { Mode } from '../session/session'
 
-/** A finished round held in the browser until the Result screen submits both. */
+/** A finished round kept in the browser for the Result screen to compare; the session has already saved it. */
 export interface PlayedRound {
   metrics: RoundMetrics
+  /** A voice step the Player typed instead: stored in the voice slot, flagged, and left out of the voice comparison. */
+  typedInstead: boolean
 }
 
 interface GameRunValue {

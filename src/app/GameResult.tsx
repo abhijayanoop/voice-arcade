@@ -16,7 +16,7 @@ const OWNERSHIP = [
 export function GameResult() {
   const { def, status } = useGame()
   const run = useGameRun()
-  const { view, completeRound } = useSession()
+  const { view, recordAnswers } = useSession()
   const [natural, setNatural] = useState<number | null>(null)
   const [ownership, setOwnership] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -27,12 +27,14 @@ export function GameResult() {
   const played = run.played(def.key)
   const typed = played.typed
   const voice = played.voice
-  if (!saved && (!typed || !voice || status.status !== 'next')) return <Navigate to={`/game/${def.key}`} replace />
+  // Both rounds are saved by now; a refresh drops what the comparison needs, so go back to the lobby.
   if (!typed || !voice) return <Navigate to="/lobby" replace />
 
   const ratio = typed.metrics.wpm > 0 ? voice.metrics.wpm / typed.metrics.wpm : 0
   const verdict =
-    typed.metrics.wpm === 0 || voice.metrics.wpm === 0
+    voice.typedInstead
+      ? 'You typed the voice round, so there is no voice comparison this time.'
+      : typed.metrics.wpm === 0 || voice.metrics.wpm === 0
       ? 'One of your rounds has no usable timing, so there is no fair speed comparison this time.'
       : ratio >= 1.2
         ? `Voice was ${ratio.toFixed(1)}× faster than typing.`
@@ -42,7 +44,7 @@ export function GameResult() {
 
   const rows: { mode: Mode; label: string }[] = [
     { mode: 'typed', label: 'Typed' },
-    { mode: 'voice', label: 'Voice' },
+    { mode: 'voice', label: voice.typedInstead ? 'Voice (typed)' : 'Voice' },
   ]
   const maxWpm = Math.max(typed.metrics.wpm, voice.metrics.wpm, 1)
 
@@ -50,11 +52,7 @@ export function GameResult() {
     setBusy(true)
     setFailed(false)
     try {
-      await completeRound(def!.key, 'typed', typed!.metrics)
-      await completeRound(def!.key, 'voice', {
-        ...voice!.metrics,
-        answers: { ...voice!.metrics.answers, felt_natural: natural, ownership },
-      })
+      await recordAnswers(def!.key, 'voice', { felt_natural: natural, ownership })
       setSaved(true)
     } catch {
       setFailed(true)
@@ -86,7 +84,7 @@ export function GameResult() {
           })}
           <p className="wa-note">
             Ideas: {String(typed.metrics.extras.idea_count)} typed, {String(voice.metrics.extras.idea_count)} by voice.
-            {voice.metrics.integrity === 'flagged' && ' Your voice round looked typed, so it is marked as flagged.'}
+            {voice.metrics.integrity === 'flagged' && !voice.typedInstead && ' Your voice round looked typed, so it is marked as flagged.'}
           </p>
         </section>
 

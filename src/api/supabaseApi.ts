@@ -64,5 +64,8 @@ export function createSupabaseApi(url: string, publishableKey: string): Api {
           : null,
       })
     },
+    async recordAnswers(token, game, mode, answers) {
+      await rpc('record_answers', { p_token: token, p_game: game, p_mode: mode, p_answers: answers })
+    },
   }
 }

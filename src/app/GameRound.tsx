@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { capture } from '../capture/capture'
 import { useRoundRecorder } from '../capture/useRoundRecorder'
+import type { RoundMetrics } from '../api/types'
+import { other } from '../games/modes'
 import { countIdeas, type GameKey } from '../games/registry'
 import type { Mode } from '../session/session'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
+import { useSession } from './SessionProvider'
 
 type Phase = 'ready' | 'running' | 'over'
 
@@ -15,12 +18,15 @@ export function GameRound() {
   if (!def || !def.playable || status?.status !== 'next' || (mode !== 'typed' && mode !== 'voice')) {
     return <Navigate to="/lobby" replace />
   }
-  return <Round key={mode} gameKey={def.key} mode={mode} firstMode={status.firstMode} />
+  // A round already saved (after a refresh) is not played twice.
+  if (status.doneModes.includes(mode)) return <Navigate to={`/game/${def.key}/${other(mode)}`} replace />
+  return <Round key={mode} gameKey={def.key} mode={mode} secondRound={status.doneModes.length > 0} />
 }
 
-function Round({ gameKey, mode, firstMode }: { gameKey: GameKey; mode: Mode; firstMode: Mode }) {
+function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; secondRound: boolean }) {
   const { def } = useGame()
   const run = useGameRun()
+  const { completeRound } = useSession()
   const navigate = useNavigate()
   const seconds = def!.seconds!
   const prompt = def!.prompts![mode]
@@ -29,6 +35,7 @@ function Round({ gameKey, mode, firstMode }: { gameKey: GameKey; mode: Mode; fir
   const [text, setText] = useState('')
   const [notice, setNotice] = useState('')
   const [typedInstead, setTypedInstead] = useState(false)
+  const [busy, setBusy] = useState(false)
   const startedAt = useRef('')
   const recorder = useRoundRecorder({
     mode,
@@ -61,30 +68,37 @@ function Round({ gameKey, mode, firstMode }: { gameKey: GameKey; mode: Mode; fir
     setPhase('running')
   }
 
-  function submit() {
+  async function submit() {
     if (text.trim() === '') {
       setNotice('That is empty. Add at least one idea.')
       return
     }
-    const metrics = capture(recorder.finish(text))
-    run.record(gameKey, mode, {
-      metrics: {
-        promptKey: prompt.key,
-        startedAt: startedAt.current,
-        activeMs: metrics.activeMs,
-        words: metrics.words,
-        chars: metrics.chars,
-        wpm: metrics.wpm,
-        keystrokes: metrics.keystrokes,
-        pasteEvents: metrics.pasteEvents,
-        insertEvents: metrics.insertEvents,
-        // A voice step typed instead is stored in the voice slot, flagged, so the (player, game, mode) key stays unique.
-        integrity: typedInstead || metrics.integrity === 'flagged' ? 'flagged' : 'ok',
-        answers: typedInstead ? { typed_instead: true } : {},
-        extras: { idea_count: countIdeas(text), edit_chars: metrics.editDistance },
-      },
-    })
-    navigate(mode === firstMode ? `/game/${gameKey}/${mode === 'typed' ? 'voice' : 'typed'}` : `/game/${gameKey}/result`)
+    const captured = capture(recorder.finish(text))
+    const metrics: RoundMetrics = {
+      promptKey: prompt.key,
+      startedAt: startedAt.current,
+      activeMs: captured.activeMs,
+      words: captured.words,
+      chars: captured.chars,
+      wpm: captured.wpm,
+      keystrokes: captured.keystrokes,
+      pasteEvents: captured.pasteEvents,
+      insertEvents: captured.insertEvents,
+      // A voice step typed instead is stored in the voice slot, flagged, so the (player, game, mode) key stays unique.
+      integrity: typedInstead || captured.integrity === 'flagged' ? 'flagged' : 'ok',
+      answers: typedInstead ? { typed_instead: true } : {},
+      extras: { idea_count: countIdeas(text), edit_chars: captured.editDistance },
+    }
+    setBusy(true)
+    try {
+      await completeRound(gameKey, mode, metrics)
+    } catch {
+      setNotice('That did not save. Try submitting again.')
+      setBusy(false)
+      return
+    }
+    run.record(gameKey, mode, { metrics, typedInstead })
+    navigate(secondRound ? `/game/${gameKey}/result` : `/game/${gameKey}/${other(mode)}`)
   }
 
   return (
@@ -118,7 +132,7 @@ function Round({ gameKey, mode, firstMode }: { gameKey: GameKey; mode: Mode; fir
               Start the clock
             </button>
           ) : (
-            <button type="button" className="wa-btn wa-btn--primary" onClick={submit} data-blip-target="submit">
+            <button type="button" className="wa-btn wa-btn--primary" disabled={busy} onClick={submit} data-blip-target="submit">
               {phase === 'over' ? 'Time is up. Submit' : 'Submit'}
             </button>
           )}

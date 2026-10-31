@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { capture, type RoundLog } from './capture'
 
 // Worked by hand: six keystrokes at 1000, 1200 ... 2000 ms spell "hi all".
-// 2 words in (2000 - 1000) ms = 1/60 min -> 120 wpm.
+// The clock runs from the round start in both modes: 2 words in 2000 ms = 1/30 min -> 60 wpm.
 const typedLog: RoundLog = {
   mode: 'typed',
   timerMs: 60000,
@@ -21,8 +21,8 @@ describe('a typed round', () => {
     expect(capture(typedLog)).toEqual({
       words: 2,
       chars: 6,
-      activeMs: 1000,
-      wpm: 120,
+      activeMs: 2000,
+      wpm: 60,
       keystrokes: 6,
       pasteEvents: 0,
       insertEvents: 0,
@@ -56,8 +56,8 @@ describe('a voice round dictated by paste', () => {
   it('flags the same text arriving by paste in a typed round', () => {
     const result = capture({ ...log, mode: 'typed' })
     expect(result.integrity).toBe('flagged')
-    expect(result.activeMs).toBe(0)
-    expect(result.wpm).toBe(0)
+    expect(result.activeMs).toBe(3000)
+    expect(result.wpm).toBe(100)
   })
 })
 
@@ -107,7 +107,7 @@ describe('timing and empty rounds', () => {
       { t: 70000, kind: 'key' as const },
     ]
     const result = capture({ mode: 'typed', timerMs: 60000, events, firstText: 'a b', finalText: 'a b' })
-    expect(result.activeMs).toBe(59000)
+    expect(result.activeMs).toBe(60000)
   })
 
   it('reports zeros for an empty round', () => {

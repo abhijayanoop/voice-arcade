@@ -62,11 +62,8 @@ export function capture(log: RoundLog): CaptureMetrics {
   const words = countWords(finalText)
   const chars = finalText.length
 
-  // Typing starts at the first input. Speech comes before the text lands, so a voice round's clock starts with the round.
-  const times = events.map((e) => e.t)
-  const start = mode === 'voice' ? 0 : Math.min(...times)
-  const end = Math.min(Math.max(...times), log.timerMs)
-  const activeMs = events.length === 0 ? 0 : Math.max(0, end - start)
+  // One clock for both modes, so typed and voice compare fairly: from the round start to the last input or the timer end, whichever is first.
+  const activeMs = events.length === 0 ? 0 : Math.min(Math.max(...events.map((e) => e.t)), log.timerMs)
   const wpm = activeMs === 0 ? 0 : Math.round((words / (activeMs / 60000)) * 10) / 10
 
   const flagged =
