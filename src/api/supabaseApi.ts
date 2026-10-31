@@ -4,6 +4,7 @@ import {
   UnknownTokenError,
   type Api,
   type JudgeItem,
+  type LeaderboardEntry,
   type PlayerState,
 } from './types'
 
@@ -64,6 +65,13 @@ export function createSupabaseApi(url: string, publishableKey: string): Api {
           ? { scene_set: description.sceneSet, target_scene: description.targetScene, text: description.text }
           : null,
       })
+    },
+    async finishArcade(token) {
+      await rpc('finish_arcade', { p_token: token })
+    },
+    async getLeaderboard() {
+      const rows = await rpc<{ code_name: string; avatar: number; wpm: number }[]>('get_leaderboard', {})
+      return rows.map((r): LeaderboardEntry => ({ codeName: r.code_name, avatar: r.avatar, wpm: Number(r.wpm) }))
     },
     async recordAnswers(token, game, mode, answers) {
       await rpc('record_answers', { p_token: token, p_game: game, p_mode: mode, p_answers: answers })

@@ -298,3 +298,89 @@ describe('saving a game round by round', () => {
     expect(voice.words).toBe(33)
   })
 })
+
+describe('the speed race and finishing the arcade', () => {
+  const ALL = ['brain_dump', 'decode', 'rant', 'juggler', 'snippet'] as const
+  async function player(api: ReturnType<typeof createMemoryApi>, codeName: string, optIn: boolean) {
+    const session = createSession({ api })
+    await session.register(profile(codeName))
+    await session.giveConsent({ leaderboardOptIn: optIn })
+    return session
+  }
+  const playVoiceBrainDump = async (s: Awaited<ReturnType<typeof player>>, wpm: number, integrity: 'ok' | 'flagged' = 'ok') => {
+    await s.completeRound('brain_dump', 'typed', metrics())
+    await s.completeRound('brain_dump', 'voice', { ...metrics(), wpm, integrity })
+  }
+
+  it('ranks only opted-in Players, fastest voice Brain dump first', async () => {
+    const api = createMemoryApi()
+    await playVoiceBrainDump(await player(api, 'Slow', true), 30)
+    await playVoiceBrainDump(await player(api, 'Fast', true), 80)
+    await playVoiceBrainDump(await player(api, 'Private', false), 200)
+
+    const board = await (await player(api, 'Viewer', false)).leaderboard()
+
+    expect(board.map((e) => [e.codeName, e.wpm])).toEqual([['Fast', 80], ['Slow', 30]])
+  })
+
+  it('leaves out a voice round that was flagged, such as one typed instead', async () => {
+    const api = createMemoryApi()
+    await playVoiceBrainDump(await player(api, 'Honest', true), 40)
+    await playVoiceBrainDump(await player(api, 'Typist', true), 150, 'flagged')
+
+    const board = await (await player(api, 'Viewer', false)).leaderboard()
+
+    expect(board.map((e) => e.codeName)).toEqual(['Honest'])
+  })
+
+  it('shows the top ten only', async () => {
+    const api = createMemoryApi()
+    for (let i = 0; i < 12; i++) await playVoiceBrainDump(await player(api, `P${i}`, true), 10 + i)
+
+    const board = await (await player(api, 'Viewer', false)).leaderboard()
+
+    expect(board).toHaveLength(10)
+    expect(board[0].wpm).toBe(21)
+  })
+
+  it('marks the arcade done once every game is complete, and remembers it on resume', async () => {
+    const api = createMemoryApi()
+    const session = await player(api, 'Finisher', false)
+    for (const game of ALL.slice(0, 4)) {
+      await session.completeRound(game, 'typed', metrics())
+      await session.completeRound(game, 'voice', metrics())
+    }
+    expect(session.view().arcadeDone).toBe(false)
+
+    await session.completeRound('snippet', 'typed', metrics())
+    expect(session.view().arcadeDone).toBe(false)
+    await session.completeRound('snippet', 'voice', metrics())
+    expect(session.view().arcadeDone).toBe(true)
+
+    const back = createSession({ api })
+    await back.resume(session.token()!)
+    expect(back.view().arcadeDone).toBe(true)
+  })
+})
+
+describe('a failed finish', () => {
+  it('is retried by submitting the last round again', async () => {
+    const api = createMemoryApi()
+    let failures = 1
+    const flaky = { ...api, finishArcade: async (t: string) => { if (failures-- > 0) throw new Error('offline'); return api.finishArcade(t) } }
+    const session = createSession({ api: flaky })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    for (const game of ['brain_dump', 'decode', 'rant', 'juggler'] as const) {
+      await session.completeRound(game, 'typed', metrics())
+      await session.completeRound(game, 'voice', metrics())
+    }
+    await session.completeRound('snippet', 'typed', metrics())
+
+    await expect(session.completeRound('snippet', 'voice', metrics())).rejects.toThrow('offline')
+    expect(session.view().arcadeDone).toBe(false)
+
+    await session.completeRound('snippet', 'voice', metrics())
+    expect(session.view().arcadeDone).toBe(true)
+  })
+})

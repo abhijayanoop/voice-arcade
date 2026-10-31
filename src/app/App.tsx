@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { BlipHost } from '../blip/BlipHost'
 import { BlipProvider } from '../blip/BlipProvider'
+import { ArcadeDone } from './ArcadeDone'
 import { GameIntro } from './GameIntro'
 import { GameResult } from './GameResult'
 import { GameRound } from './GameRound'
@@ -33,6 +34,7 @@ export function App() {
               <Route path="/name" element={<Guard step="register"><NameScreen /></Guard>} />
               <Route path="/ready" element={<Guard step="consent"><ReadyPopup /></Guard>} />
               <Route path="/lobby" element={<Guard step="lobby"><Lobby /></Guard>} />
+              <Route path="/done" element={<Guard step="lobby"><ArcadeDone /></Guard>} />
               <Route path="/game/:key" element={<Guard step="lobby"><GameIntro /></Guard>} />
               <Route path="/game/:key/result" element={<Guard step="lobby"><GameResult /></Guard>} />
               <Route path="/game/:key/:mode" element={<Guard step="lobby"><GameRound /></Guard>} />

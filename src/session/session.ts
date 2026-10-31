@@ -4,6 +4,7 @@ import {
   UnknownTokenError,
   type Api,
   type DescriptionSubmission,
+  type LeaderboardEntry,
   type Mode,
   type PlayerProfile,
   type RoundMetrics,
@@ -26,6 +27,8 @@ export interface SessionView {
   player: { codeName: string; avatar: number } | null
   registerError: 'code_name_taken' | null
   games: GameView[]
+  /** True once every game is done and the finish has been saved. */
+  arcadeDone: boolean
   /** One wave per finished round. */
   waves: number
 }
@@ -44,6 +47,8 @@ export interface Session {
     metrics: RoundMetrics,
     description?: DescriptionSubmission,
   ): Promise<void>
+  /** The Speed race podium: opted-in Players only. */
+  leaderboard(): Promise<LeaderboardEntry[]>
   /** Adds the post-game answers to a round already saved. */
   recordAnswers(game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
 }
@@ -62,6 +67,7 @@ export function createSession({
   let step: Step = 'register'
   let player: SessionView['player'] = null
   let registerError: SessionView['registerError'] = null
+  let arcadeDone = false
   const completedModes = new Map<GameKey, Set<Mode>>()
   const isDone = (key: GameKey) => completedModes.get(key)?.size === 2
 
@@ -82,8 +88,14 @@ export function createSession({
     })
   }
 
+  async function finishIfDone(playerToken: string) {
+    if (arcadeDone || !GAMES.every(({ key }) => isDone(key))) return
+    await api.finishArcade(playerToken)
+    arcadeDone = true
+  }
+
   return {
-    view: () => ({ step, player, registerError, games: games(), waves: wavesEarned() }),
+    view: () => ({ step, player, registerError, games: games(), arcadeDone, waves: wavesEarned() }),
     token: () => token,
     async register(profile) {
       try {
@@ -116,6 +128,7 @@ export function createSession({
       player = { codeName: state.player.codeName, avatar: state.player.avatar }
       step = state.player.consented ? 'lobby' : 'consent'
       registerError = null
+      arcadeDone = state.player.arcadeDone
       completedModes.clear()
       for (const { game, mode, modeOrder } of state.rounds) {
         completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
@@ -126,11 +139,14 @@ export function createSession({
     async completeRound(game, mode, metrics, description) {
       if (!token) throw new Error('register before playing')
       const next = games().find((g) => g.status === 'next')
-      if (next?.key !== game) return
+      // A retry after a failed finish lands here: every game is done, so only the finish is left to save.
+      if (next?.key !== game) return finishIfDone(token)
       const modeOrder = mode === firstModes.get(game) ? 1 : 2
       await api.submitRound(token, { ...metrics, game, mode, modeOrder }, description)
       completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
+      await finishIfDone(token)
     },
+    leaderboard: () => api.getLeaderboard(),
     async recordAnswers(game, mode, answers) {
       if (!token) throw new Error('register before playing')
       await api.recordAnswers(token, game, mode, answers)

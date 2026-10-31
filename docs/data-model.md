@@ -30,7 +30,7 @@ Implemented in `supabase/migrations/0001_voice_arcade.sql` and `0002_record_answ
 | `submit_round(token, round, description?)` | Inserts the round; idempotent on (player, game, mode); inserts the description when given |
 | `record_answers(token, game, mode, answers)` | Merges post-game answers into a saved round; metrics are untouched (migration `0002_record_answers.sql`) |
 | `finish_arcade(token)` | Sets `arcade_done_at` |
-| `get_leaderboard()` | Top ten opted-in players by best voice words per minute in Brain dump blitz: code name, avatar, wpm only |
+| `get_leaderboard()` | Top ten opted-in players by best unflagged voice words per minute in Brain dump blitz: code name, avatar, wpm only |
 | `get_judge_batch(judge_key, n)` | Descriptions this Judge has not judged: id, text, scene set. Never returns mode, author or target |
 | `submit_judgment(judge_key, description_id, picked_scene)` | Stores the pick and whether it was correct |
 | `mark_quest(token, day)` | Records a quest day |
