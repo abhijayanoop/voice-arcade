@@ -48,6 +48,13 @@ export interface JudgeItem {
   sceneSet: string
 }
 
+/** One row of the Speed race: code name, avatar and best voice words per minute, nothing else. */
+export interface LeaderboardEntry {
+  codeName: string
+  avatar: number
+  wpm: number
+}
+
 export interface PlayerState {
   player: PlayerProfile & { consented: boolean; leaderboardOptIn: boolean; arcadeDone: boolean }
   rounds: { game: GameKey; mode: Mode; modeOrder: 1 | 2 }[]
@@ -76,6 +83,10 @@ export interface Api {
   getState(token: string): Promise<PlayerState>
   /** Idempotent on (player, game, mode): a repeat is ignored. */
   submitRound(token: string, round: RoundSubmission, description?: DescriptionSubmission): Promise<void>
+  /** Sets the finish time once; a repeat is ignored. */
+  finishArcade(token: string): Promise<void>
+  /** Top ten opted-in Players by best voice words per minute in Brain dump blitz. */
+  getLeaderboard(): Promise<LeaderboardEntry[]>
   /** Merges answers into a saved round; the metrics stay as submitted. */
   recordAnswers(token: string, game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
   /** Up to n descriptions this Judge has not judged yet. No sign-up: the Judge is a random key kept in their browser. */

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useBlip } from '../blip/BlipProvider'
 import { GAMES } from '../games/registry'
 import { Avatar } from '../ui/Avatar'
+import { Podium } from '../ui/Podium'
 import { useSession } from './SessionProvider'
 
 const DEFS = new Map(GAMES.map((def) => [def.key, def]))
@@ -80,6 +81,13 @@ export function Lobby() {
             )
           })}
         </div>
+
+        {view.arcadeDone && (
+          <p className="wa-body">
+            You finished the arcade. <Link to="/done">See your summary</Link>
+          </p>
+        )}
+        <Podium />
 
         {personalLink && (
           <p className="wa-body">

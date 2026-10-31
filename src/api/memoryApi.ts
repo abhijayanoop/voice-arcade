@@ -7,12 +7,14 @@ import {
   type RoundSubmission,
   type DescriptionSubmission,
   type JudgeItem,
+  type LeaderboardEntry,
 } from './types'
 
 interface StoredPlayer extends PlayerProfile {
   token: string
   consented: boolean
   leaderboardOptIn: boolean
+  arcadeDone: boolean
 }
 
 export interface MemoryApi extends Api {
@@ -46,7 +48,7 @@ export function createMemoryApi(): MemoryApi {
       )
       if (taken) throw new CodeNameTakenError()
       const token = `mem-${store.size + 1}-${Math.random().toString(36).slice(2, 10)}`
-      store.set(token, { ...profile, token, consented: false, leaderboardOptIn: false })
+      store.set(token, { ...profile, token, consented: false, leaderboardOptIn: false, arcadeDone: false })
       return { token }
     },
     async recordConsent(token, leaderboardOptIn) {
@@ -55,9 +57,9 @@ export function createMemoryApi(): MemoryApi {
       player.leaderboardOptIn = leaderboardOptIn
     },
     async getState(token): Promise<PlayerState> {
-      const { codeName, avatar, cohort, os, languages, consented, leaderboardOptIn } = find(token)
+      const { codeName, avatar, cohort, os, languages, consented, leaderboardOptIn, arcadeDone } = find(token)
       return {
-        player: { codeName, avatar, cohort, os, languages: [...languages], consented, leaderboardOptIn, arcadeDone: false },
+        player: { codeName, avatar, cohort, os, languages: [...languages], consented, leaderboardOptIn, arcadeDone },
         rounds: (roundsByToken.get(token) ?? []).map(({ game, mode, modeOrder }) => ({ game, mode, modeOrder })),
         questDays: [],
         checkinDays: [],
@@ -70,6 +72,21 @@ export function createMemoryApi(): MemoryApi {
       if (rounds.some((r) => r.game === round.game && r.mode === round.mode)) return
       roundsByToken.set(token, [...rounds, round])
       if (description) descriptionList.push({ ...description, id: `desc-${descriptionList.length + 1}` })
+    },
+    async finishArcade(token) {
+      find(token).arcadeDone = true
+    },
+    // Mirrors get_leaderboard: opted-in Players only, voice Brain dump rounds that were not flagged.
+    async getLeaderboard() {
+      const board: LeaderboardEntry[] = []
+      for (const [token, player] of store) {
+        if (!player.leaderboardOptIn) continue
+        const wpms = (roundsByToken.get(token) ?? [])
+          .filter((r) => r.game === 'brain_dump' && r.mode === 'voice' && r.integrity === 'ok')
+          .map((r) => r.wpm)
+        if (wpms.length > 0) board.push({ codeName: player.codeName, avatar: player.avatar, wpm: Math.max(...wpms) })
+      }
+      return board.sort((a, b) => b.wpm - a.wpm).slice(0, 10)
     },
     async recordAnswers(token, game, mode, answers) {
       find(token)

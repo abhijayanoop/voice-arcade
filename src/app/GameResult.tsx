@@ -6,12 +6,11 @@ import { distinguishingDetails, sceneSetFromId } from '../scenes/scenes'
 import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
 import { Chip } from '../ui/Chip'
+import { TIE_RATIO } from '../games/compare'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
 import { useSession } from './SessionProvider'
 
-/** Voice and typing within this factor of each other count as a tie. */
-const TIE_RATIO = 1.2
 const NATURAL = ['Very awkward', 'A bit awkward', 'Fine', 'Natural', 'Very natural']
 const OWNERSHIP = [
   { value: 'mine', label: 'Yes, all mine' },
@@ -187,7 +186,11 @@ export function GameResult() {
         ) : (
           <div className="wa-actions">
             <span className="wa-gain" data-blip-target="waves">{view.waves} waves earned so far</span>
-            <Link to="/lobby" className="wa-btn wa-btn--primary">Back to lobby</Link>
+            {view.arcadeDone ? (
+              <Link to="/done" className="wa-btn wa-btn--primary">Finish the arcade</Link>
+            ) : (
+              <Link to="/lobby" className="wa-btn wa-btn--primary">Back to lobby</Link>
+            )}
           </div>
         )}
       </div>
