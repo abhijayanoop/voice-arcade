@@ -83,3 +83,30 @@ export function capture(log: RoundLog): CaptureMetrics {
     integrity: flagged ? 'flagged' : 'ok',
   }
 }
+
+export interface RubricHits {
+  place: boolean
+  time: boolean
+  who: boolean
+  hits: number
+}
+
+const PLACE = /\b(?:at|in|near|outside|inside|by)\s+the\b|\b(?:caf[eé]|office|station|park|home|house|room|library|restaurant|bar|pub|mall|campus|gym|school|hotel|airport|street|lobby|entrance|floor|building|downtown|venue|place)\b/i
+const TIME = /\b\d{1,2}(?::\d{2})?\s?(?:am|pm)\b|\b\d{1,2}:\d{2}\b|o['’]?clock|\b(?:noon|midnight|tonight|tomorrow|today|morning|afternoon|evening|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i
+const WHO = /\b(?:with|bring|bringing|invite|inviting|joining|joins|coming|everyone|everybody|team|friends?|colleagues?|boss|manager|we|he|she|they)\b/i
+
+/** A capitalised word in mid-sentence reads as a name; the opening word of a sentence and "I" do not. */
+function hasName(text: string): boolean {
+  return /(?<![.!?]\s)(?<!^)\b(?!I\b)[A-Z][a-z]+\b/.test(text.trim())
+}
+
+/**
+ * The Juggler's approximate rubric: does the reply mention a place, a time and who is involved?
+ * Plain keyword matching, so it can miss or over-count; it is reported as approximate.
+ */
+export function rubricHits(text: string): RubricHits {
+  const place = PLACE.test(text)
+  const time = TIME.test(text)
+  const who = WHO.test(text) || hasName(text)
+  return { place, time, who, hits: [place, time, who].filter(Boolean).length }
+}

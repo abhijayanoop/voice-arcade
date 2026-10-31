@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { capture, type RoundLog } from './capture'
+import { capture, rubricHits, type RoundLog } from './capture'
 
 // Worked by hand: six keystrokes at 1000, 1200 ... 2000 ms spell "hi all".
 // The clock runs from the round start in both modes: 2 words in 2000 ms = 1/30 min -> 60 wpm.
@@ -119,5 +119,28 @@ describe('timing and empty rounds', () => {
 
   it('counts words as whitespace-separated tokens', () => {
     expect(capture({ mode: 'typed', timerMs: 1, events: [], firstText: '', finalText: '  one\ntwo   three ' }).words).toBe(3)
+  })
+})
+
+describe('rubricHits', () => {
+  it('counts place, time and who from simple keywords', () => {
+    expect(rubricHits('Meet me at the station at 6pm, Priya is coming too.')).toEqual({
+      place: true, time: true, who: true, hits: 3,
+    })
+  })
+
+  it('finds only what the reply mentions', () => {
+    expect(rubricHits('Sure, see you tomorrow.')).toEqual({ place: false, time: true, who: false, hits: 1 })
+    expect(rubricHits('Okay sounds good')).toMatchObject({ hits: 0 })
+    expect(rubricHits('')).toMatchObject({ hits: 0 })
+  })
+
+  it('does not take a sentence-opening word or the pronoun I for a name', () => {
+    expect(rubricHits('Great. Sure. I will be there.').who).toBe(false)
+  })
+
+  it('reads clock times written with a colon or o\'clock', () => {
+    expect(rubricHits('18:30 works').time).toBe(true)
+    expect(rubricHits('around seven o\'clock').time).toBe(true)
   })
 })

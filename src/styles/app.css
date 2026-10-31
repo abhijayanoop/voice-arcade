@@ -87,3 +87,5 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
 .wa-scene--pick:hover:not(:disabled) { border-color: var(--ink); }
 .wa-scene--pick:focus-visible { outline: 3px solid var(--lavender); outline-offset: 3px; }
 .wa-scene--pick:disabled { opacity: .6; cursor: default; }
+
+.wa-juggler { width: 100%; max-width: 360px; height: auto; border-radius: var(--radius-md); border: 1.5px solid var(--cream-300); touch-action: none; }
