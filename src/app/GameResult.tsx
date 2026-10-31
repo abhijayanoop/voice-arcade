@@ -122,7 +122,7 @@ export function GameResult() {
           </div>
         ) : (
           <div className="wa-actions">
-            <span className="wa-gain" data-blip-target="waves">+2 waves · {view.waves} total</span>
+            <span className="wa-gain" data-blip-target="waves">{view.waves} waves earned so far</span>
             <Link to="/lobby" className="wa-btn wa-btn--primary">Back to lobby</Link>
           </div>
         )}
