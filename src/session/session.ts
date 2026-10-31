@@ -1,10 +1,17 @@
 import { GAMES, type GameKey } from '../games/registry'
-import { CodeNameTakenError, type Api, type PlayerProfile } from '../api/types'
+import {
+  CodeNameTakenError,
+  UnknownTokenError,
+  type Api,
+  type DescriptionSubmission,
+  type Mode,
+  type PlayerProfile,
+  type RoundMetrics,
+} from '../api/types'
 
+export type { Mode }
 export type Step = 'register' | 'consent' | 'lobby'
 export type GameStatus = 'done' | 'next' | 'locked'
-
-export type Mode = 'typed' | 'voice'
 
 export interface GameView {
   key: GameKey
@@ -21,9 +28,18 @@ export interface SessionView {
 
 export interface Session {
   view(): SessionView
+  /** The Player's token, for the personal link; null until registered or resumed. */
+  token(): string | null
   register(profile: PlayerProfile): Promise<void>
   giveConsent(choice: { leaderboardOptIn: boolean }): Promise<void>
-  completeRound(game: GameKey, mode: Mode): void
+  /** Restores a Player from their token. Returns false, changing nothing, when the token is unknown. */
+  resume(token: string): Promise<boolean>
+  completeRound(
+    game: GameKey,
+    mode: Mode,
+    metrics: RoundMetrics,
+    description?: DescriptionSubmission,
+  ): Promise<void>
 }
 
 export function createSession({
@@ -58,6 +74,7 @@ export function createSession({
 
   return {
     view: () => ({ step, player, registerError, games: games() }),
+    token: () => token,
     async register(profile) {
       try {
         token = (await api.registerPlayer(profile)).token
@@ -77,9 +94,31 @@ export function createSession({
       await api.recordConsent(token, leaderboardOptIn)
       step = 'lobby'
     },
-    completeRound(game, mode) {
+    async resume(candidate) {
+      let state
+      try {
+        state = await api.getState(candidate)
+      } catch (error) {
+        if (error instanceof UnknownTokenError) return false
+        throw error
+      }
+      token = candidate
+      player = { codeName: state.player.codeName, avatar: state.player.avatar }
+      step = state.player.consented ? 'lobby' : 'consent'
+      registerError = null
+      completedModes.clear()
+      for (const { game, mode, modeOrder } of state.rounds) {
+        completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
+        if (modeOrder === 1) firstModes.set(game, mode)
+      }
+      return true
+    },
+    async completeRound(game, mode, metrics, description) {
+      if (!token) throw new Error('register before playing')
       const next = games().find((g) => g.status === 'next')
       if (next?.key !== game) return
+      const modeOrder = mode === firstModes.get(game) ? 1 : 2
+      await api.submitRound(token, { ...metrics, game, mode, modeOrder }, description)
       completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
     },
   }

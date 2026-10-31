@@ -1,4 +1,6 @@
-export type GameKey = 'brain_dump' | 'decode' | 'rant' | 'juggler' | 'snippet'
+import type { GameKey } from '../api/types'
+
+export type { GameKey }
 
 export interface GameDef {
   key: GameKey
