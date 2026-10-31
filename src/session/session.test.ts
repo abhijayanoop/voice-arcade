@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createMemoryApi } from '../api/memoryApi'
 import { createSession } from './session'
-import type { PlayerProfile } from '../api/types'
+import type { PlayerProfile, RoundMetrics } from '../api/types'
 
 const profile = (codeName = 'Mango'): PlayerProfile => ({
   codeName,
@@ -9,6 +9,21 @@ const profile = (codeName = 'Mango'): PlayerProfile => ({
   cohort: 'developer',
   os: 'mac',
   languages: ['English'],
+})
+
+const metrics = (words = 20): RoundMetrics => ({
+  promptKey: 'p1',
+  startedAt: '2026-11-01T10:00:00.000Z',
+  activeMs: 60000,
+  words,
+  chars: words * 5,
+  wpm: words,
+  keystrokes: words * 5,
+  pasteEvents: 0,
+  insertEvents: 0,
+  integrity: 'ok',
+  answers: {},
+  extras: {},
 })
 
 describe('registering', () => {
@@ -72,18 +87,18 @@ describe('unlocking', () => {
   it('keeps a game as next until both its modes are complete, then unlocks the following game', async () => {
     const session = await inLobby()
 
-    session.completeRound('brain_dump', 'typed')
+    await session.completeRound('brain_dump', 'typed', metrics())
     expect(statuses(session)).toEqual(['next', 'locked', 'locked', 'locked', 'locked'])
 
-    session.completeRound('brain_dump', 'voice')
+    await session.completeRound('brain_dump', 'voice', metrics())
     expect(statuses(session)).toEqual(['done', 'next', 'locked', 'locked', 'locked'])
   })
 
   it('ignores rounds for a game that is still locked', async () => {
     const session = await inLobby()
 
-    session.completeRound('rant', 'typed')
-    session.completeRound('rant', 'voice')
+    await session.completeRound('rant', 'typed', metrics())
+    await session.completeRound('rant', 'voice', metrics())
 
     expect(statuses(session)).toEqual(['next', 'locked', 'locked', 'locked', 'locked'])
   })
@@ -106,7 +121,7 @@ describe('mode order', () => {
 
     await session.register(profile())
     await session.giveConsent({ leaderboardOptIn: false })
-    session.completeRound('brain_dump', 'typed')
+    await session.completeRound('brain_dump', 'typed', metrics())
 
     expect(session.view().games.map((g) => g.firstMode)).toEqual(before)
   })
@@ -117,5 +132,98 @@ describe('mode order', () => {
       for (const mode of firstModes(Math.random)) seen.add(mode)
     }
     expect([...seen].sort()).toEqual(['typed', 'voice'])
+  })
+})
+
+describe('persisting rounds', () => {
+  it('submits each completed round with its mode order and ignores locked games', async () => {
+    const api = createMemoryApi()
+    const session = createSession({ api, random: () => 0.9 }) // voice first everywhere
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+
+    await session.completeRound('brain_dump', 'voice', metrics(33))
+    await session.completeRound('brain_dump', 'typed', metrics(21))
+    await session.completeRound('rant', 'typed', metrics())
+
+    expect(api.rounds().map((r) => [r.game, r.mode, r.modeOrder, r.words])).toEqual([
+      ['brain_dump', 'voice', 1, 33],
+      ['brain_dump', 'typed', 2, 21],
+    ])
+  })
+
+  it('stores a Decode description alongside its round', async () => {
+    const api = createMemoryApi()
+    const session = createSession({ api })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    await session.completeRound('brain_dump', 'typed', metrics())
+    await session.completeRound('brain_dump', 'voice', metrics())
+
+    const description = { sceneSet: 'set-a', targetScene: 'scene-2', text: 'a red kite over a hill' }
+    await session.completeRound('decode', 'typed', metrics(), description)
+
+    expect(api.descriptions()).toEqual([description])
+  })
+})
+
+describe('resuming from a personal link', () => {
+  async function playedHalfway() {
+    const api = createMemoryApi()
+    const before = createSession({ api, random: () => 0.9 }) // voice first everywhere
+    await before.register(profile('Mango'))
+    await before.giveConsent({ leaderboardOptIn: true })
+    await before.completeRound('brain_dump', 'voice', metrics())
+    await before.completeRound('brain_dump', 'typed', metrics())
+    await before.completeRound('decode', 'voice', metrics())
+    return { api, token: before.token()! }
+  }
+
+  it('restores the Player, the lobby and the unlock progress', async () => {
+    const { api, token } = await playedHalfway()
+
+    const after = createSession({ api })
+    expect(await after.resume(token)).toBe(true)
+
+    expect(after.view().step).toBe('lobby')
+    expect(after.view().player).toEqual({ codeName: 'Mango', avatar: 2 })
+    expect(after.view().games.map((g) => g.status)).toEqual([
+      'done', 'next', 'locked', 'locked', 'locked',
+    ])
+    expect(after.token()).toBe(token)
+  })
+
+  it('finishes a half-played game from where the Player stopped, keeping its mode order', async () => {
+    const { api, token } = await playedHalfway()
+    const after = createSession({ api, random: () => 0 }) // would pick typed first if re-drawn
+
+    await after.resume(token)
+    expect(after.view().games[1].firstMode).toBe('voice')
+
+    await after.completeRound('decode', 'typed', metrics(), { sceneSet: 's', targetScene: 't', text: 'x' })
+    expect(after.view().games.map((g) => g.status)).toEqual([
+      'done', 'done', 'next', 'locked', 'locked',
+    ])
+    expect(api.rounds().find((r) => r.game === 'decode' && r.mode === 'typed')?.modeOrder).toBe(2)
+  })
+
+  it('sends a Player who registered but never consented back to consent', async () => {
+    const api = createMemoryApi()
+    const before = createSession({ api })
+    await before.register(profile())
+
+    const after = createSession({ api })
+    await after.resume(before.token()!)
+
+    expect(after.view().step).toBe('consent')
+  })
+
+  it('reports an unknown link without changing the session', async () => {
+    const session = createSession({ api: createMemoryApi() })
+
+    expect(await session.resume('not-a-token')).toBe(false)
+
+    expect(session.view().step).toBe('register')
+    expect(session.token()).toBeNull()
   })
 })

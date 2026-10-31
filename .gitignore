@@ -3,3 +3,4 @@ dist
 .env
 .env.*
 src/styles/tokens.css
+!.env.example

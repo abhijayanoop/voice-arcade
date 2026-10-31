@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { GAMES } from '../games/registry'
 import { Avatar } from '../ui/Avatar'
 import { useSession } from './SessionProvider'
@@ -6,7 +7,8 @@ const DEFS = new Map(GAMES.map((def) => [def.key, def]))
 const STATE_LABEL = { done: 'Done', next: 'Up next', locked: 'Locked' } as const
 
 export function Lobby() {
-  const { view } = useSession()
+  const { view, personalLink } = useSession()
+  const [copied, setCopied] = useState(false)
   const doneCount = view.games.filter((g) => g.status === 'done').length
 
   return (
@@ -49,6 +51,19 @@ export function Lobby() {
             )
           })}
         </div>
+
+        {personalLink && (
+          <p className="wa-body">
+            Your personal link brings you back here on day 2 and 3. Keep it safe.{' '}
+            <button
+              type="button"
+              className="wa-btn"
+              onClick={() => navigator.clipboard.writeText(personalLink).then(() => setCopied(true))}
+            >
+              {copied ? 'Copied' : 'Copy my link'}
+            </button>
+          </p>
+        )}
       </div>
     </main>
   )

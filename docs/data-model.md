@@ -20,6 +20,8 @@ Postgres on Supabase. Every table has row-level security enabled and no policy f
 
 ## RPC functions
 
+Implemented in `supabase/migrations/0001_voice_arcade.sql`. Parameters are prefixed `p_`. Code names are unique ignoring case. Token lookup is a helper in a separate `private` schema so it is not callable as an RPC. Failures raise `code_name_taken`, `unknown_token` or `unknown_description`. `get_state` returns camelCase JSON matching the `PlayerState` type in `src/api/types.ts`.
+
 | Function | Does |
 |---|---|
 | `register_player(code_name, avatar, cohort, os, languages)` | Creates the player; fails clearly if the code name is taken; returns the token |
