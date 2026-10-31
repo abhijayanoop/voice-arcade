@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useBlip, useBlipOnMount, useQuietWhile } from '../blip/BlipProvider'
 import { capture } from '../capture/capture'
 import { useRoundRecorder } from '../capture/useRoundRecorder'
 import type { RoundMetrics } from '../api/types'
@@ -37,10 +38,17 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   const [typedInstead, setTypedInstead] = useState(false)
   const [busy, setBusy] = useState(false)
   const startedAt = useRef('')
+  const { say } = useBlip()
+  useBlipOnMount(mode === 'typed' ? 'round.typed_intro' : 'round.voice_intro')
+  // Quiet mode: Blip docks and stays silent for as long as the clock runs.
+  useQuietWhile(phase === 'running')
   const recorder = useRoundRecorder({
     mode,
     timerMs: seconds * 1000,
-    onBlocked: () => setNotice('Paste is off in typed rounds. Fresh words only.'),
+    onBlocked: () => {
+      setNotice('Paste is off in typed rounds. Fresh words only.')
+      say('round.pasted')
+    },
   })
 
   useEffect(() => {
@@ -62,6 +70,15 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
     if (phase === 'running') recorder.field.current?.focus()
   }, [phase, recorder.field])
 
+  useEffect(() => {
+    if (phase === 'over') say('round.time_up')
+  }, [phase, say])
+
+  function typeInstead() {
+    setTypedInstead(true)
+    say('round.typed_in_voice')
+  }
+
   function start() {
     startedAt.current = new Date().toISOString()
     recorder.start()
@@ -71,6 +88,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   async function submit() {
     if (text.trim() === '') {
       setNotice('That is empty. Add at least one idea.')
+      say('round.empty_submit')
       return
     }
     const captured = capture(recorder.finish(text))
@@ -137,7 +155,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
             </button>
           )}
           {mode === 'voice' && !typedInstead && (
-            <button type="button" className="wa-btn wa-btn--ghost" onClick={() => setTypedInstead(true)}>
+            <button type="button" className="wa-btn wa-btn--ghost" onClick={typeInstead}>
               Type it instead
             </button>
           )}

@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { BlipDock } from '../ui/Blip'
+import { BlipHost } from '../blip/BlipHost'
+import { BlipProvider } from '../blip/BlipProvider'
 import { GameIntro } from './GameIntro'
 import { GameResult } from './GameResult'
 import { GameRound } from './GameRound'
@@ -23,6 +24,7 @@ function Guard({ step, children }: { step: keyof typeof ROUTE_FOR_STEP; children
 export function App() {
   return (
     <SessionProvider>
+      <BlipProvider>
       <GameRunProvider>
       <BrowserRouter>
         <Routes>
@@ -37,9 +39,10 @@ export function App() {
           <Route path="/p/:token" element={<PersonalLink />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <BlipDock />
+        <BlipHost />
       </BrowserRouter>
       </GameRunProvider>
+    </BlipProvider>
     </SessionProvider>
   )
 }
