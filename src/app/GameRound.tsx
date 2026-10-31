@@ -1,19 +1,36 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useBlip, useBlipOnMount, useQuietWhile } from '../blip/BlipProvider'
-import { capture } from '../capture/capture'
+import { capture, editDistance, type CaptureMetrics } from '../capture/capture'
 import { useRoundRecorder } from '../capture/useRoundRecorder'
 import type { DescriptionSubmission, RoundMetrics } from '../api/types'
 import { other } from '../games/modes'
-import { countIdeas, type GameKey } from '../games/registry'
+import { countIdeas, LANG_MIXES, type GameKey } from '../games/registry'
 import { generateSceneSet, seedForMode } from '../scenes/scenes'
 import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
+import { Chip } from '../ui/Chip'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
 import { useSession } from './SessionProvider'
 
-type Phase = 'ready' | 'running' | 'over'
+type Phase = 'ready' | 'running' | 'over' | 'edit'
+
+const SENDABLE = ['Not at all', 'Barely', 'Mostly', 'Sendable', 'Send it now']
+const ACCURACY = ['Mangled', 'Rough', 'OK', 'Good', 'Spot on']
+
+function Rating({ legend, labels, value, onPick }: { legend: string; labels: string[]; value: number | null; onPick: (n: number) => void }) {
+  return (
+    <fieldset className="wa-field">
+      <legend className="wa-label">{legend}</legend>
+      <div className="wa-chips">
+        {labels.map((label, i) => (
+          <Chip key={label} pressed={value === i + 1} onToggle={() => onPick(i + 1)}>{label}</Chip>
+        ))}
+      </div>
+    </fieldset>
+  )
+}
 
 export function GameRound() {
   const { def, status } = useGame()
@@ -47,7 +64,13 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   const [notice, setNotice] = useState('')
   const [typedInstead, setTypedInstead] = useState(false)
   const [busy, setBusy] = useState(false)
+  // Rant only: the text as it stood when the rant ended and the speed numbers frozen then, so editing time never counts as ranting time.
+  const isRant = gameKey === 'rant'
+  const [raw, setRaw] = useState<{ text: string; captured: CaptureMetrics } | null>(null)
+  const [sendable, setSendable] = useState<number | null>(null)
+  const [accuracy, setAccuracy] = useState<number | null>(null)
   const startedAt = useRef('')
+  const { langMix, setLangMix } = run
   const { say } = useBlip()
   useBlipOnMount(mode === 'typed' ? 'round.typed_intro' : 'round.voice_intro')
   // Quiet mode: Blip docks and stays silent for as long as the clock runs.
@@ -77,12 +100,24 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   }, [phase])
 
   useEffect(() => {
-    if (phase === 'running') recorder.field.current?.focus()
+    if (phase === 'running' || phase === 'edit') recorder.field.current?.focus()
   }, [phase, recorder.field])
 
   useEffect(() => {
     if (phase === 'over') say('round.time_up')
   }, [phase, say])
+
+  function finishRant() {
+    setRaw({ text, captured: capture(recorder.finish(text)) })
+    setPhase('edit')
+    say('rant.edit')
+  }
+
+  useEffect(() => {
+    if (isRant && phase === 'over') finishRant()
+    // finishRant reads the latest text, and the phase moves on at once, so this runs once per round.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRant, phase])
 
   function typeInstead() {
     setTypedInstead(true)
@@ -96,12 +131,21 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   }
 
   async function submit() {
+    if (isRant && !raw) {
+      if (text.trim() === '') {
+        setNotice(def!.emptyNotice!)
+        say('round.empty_submit')
+        return
+      }
+      finishRant()
+      return
+    }
     if (text.trim() === '') {
       setNotice(def!.emptyNotice ?? 'That is empty. Add something first.')
       say('round.empty_submit')
       return
     }
-    const captured = capture(recorder.finish(text))
+    const captured = raw?.captured ?? capture(recorder.finish(text))
     const metrics: RoundMetrics = {
       promptKey: prompt.key,
       startedAt: startedAt.current,
@@ -114,10 +158,15 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
       insertEvents: captured.insertEvents,
       // A voice step typed instead is stored in the voice slot, flagged, so the (player, game, mode) key stays unique.
       integrity: typedInstead || captured.integrity === 'flagged' ? 'flagged' : 'ok',
-      answers: typedInstead ? { typed_instead: true } : {},
+      answers: {
+        ...(typedInstead ? { typed_instead: true } : {}),
+        ...(isRant ? { lang_mix: langMix, sendable, ...(typedInstead ? {} : { accuracy }) } : {}),
+      },
       extras: decode
         ? { edit_chars: captured.editDistance }
-        : { idea_count: countIdeas(text), edit_chars: captured.editDistance },
+        : isRant
+          ? { edit_chars: editDistance(raw!.text, text) }
+          : { idea_count: countIdeas(text), edit_chars: captured.editDistance },
     }
     // The description is the one dictated text that is stored, with its scene set and target.
     // A voice step typed instead is left out, so Judges never score typed text as voice.
@@ -164,25 +213,50 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
             <span>{def!.voiceHint}</span>
           </div>
         )}
+        {isRant && phase === 'ready' && (
+          <fieldset className="wa-field" data-blip-target="lang-mix">
+            <legend className="wa-label">What language mix do you actually rant in?</legend>
+            <div className="wa-chips">
+              {LANG_MIXES.map((mix) => (
+                <Chip key={mix} pressed={langMix === mix} onToggle={() => setLangMix(mix)}>{mix}</Chip>
+              ))}
+            </div>
+          </fieldset>
+        )}
+        {isRant && phase === 'edit' && (
+          <>
+            <p className="wa-body">Now edit it into something you could send. The box below holds your rant: change it freely.</p>
+            <Rating legend="How sendable was your raw rant?" labels={SENDABLE} value={sendable} onPick={setSendable} />
+            {mode === 'voice' && !typedInstead && (
+              <Rating legend="How accurate was Flow?" labels={ACCURACY} value={accuracy} onPick={setAccuracy} />
+            )}
+          </>
+        )}
         <textarea
           ref={recorder.field}
           className="wa-input"
           aria-label={def!.inputLabel}
           rows={8}
           value={text}
-          readOnly={phase !== 'running'}
+          readOnly={phase !== 'running' && phase !== 'edit'}
           onChange={(e) => setText(e.target.value)}
           data-blip-target="answer-input"
         />
         {notice && <p className="wa-error" role="status">{notice}</p>}
         <div className="wa-actions">
           {phase === 'ready' ? (
-            <button type="button" className="wa-btn wa-btn--primary" onClick={start} data-blip-target="start">
+            <button type="button" className="wa-btn wa-btn--primary" disabled={isRant && !langMix} onClick={start} data-blip-target="start">
               Start the clock
             </button>
           ) : (
-            <button type="button" className="wa-btn wa-btn--primary" disabled={busy} onClick={submit} data-blip-target="submit">
-              {phase === 'over' ? 'Time is up. Submit' : 'Submit'}
+            <button
+              type="button"
+              className="wa-btn wa-btn--primary"
+              disabled={busy || (phase === 'edit' && (sendable === null || (mode === 'voice' && !typedInstead && accuracy === null)))}
+              onClick={submit}
+              data-blip-target="submit"
+            >
+              {isRant ? (phase === 'edit' ? 'Submit the sendable version' : 'Done ranting') : phase === 'over' ? 'Time is up. Submit' : 'Submit'}
             </button>
           )}
           {mode === 'voice' && !typedInstead && (

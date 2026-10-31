@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
+import type { RoundMetrics } from '../api/types'
 import { useBlip } from '../blip/BlipProvider'
 import { distinguishingDetails, sceneSetFromId } from '../scenes/scenes'
 import { SceneSvg } from '../scenes/SceneSvg'
@@ -17,6 +18,12 @@ const OWNERSHIP = [
   { value: 'mostly', label: 'Mostly mine' },
   { value: 'not', label: 'Not really' },
 ]
+
+/** Rant: the ratings and edit effort that were saved, never the text itself. */
+function rantSummary(typed: RoundMetrics, voice: RoundMetrics): string {
+  const accuracy = voice.answers.typed_instead ? '' : ` Flow accuracy: ${String(voice.answers.accuracy)}/5.`
+  return `Sendable: ${String(typed.answers.sendable)}/5 typed, ${String(voice.answers.sendable)}/5 by voice.${accuracy} Characters edited: ${String(typed.extras.edit_chars)} typed, ${String(voice.extras.edit_chars)} by voice.`
+}
 
 export function GameResult() {
   const { def, status } = useGame()
@@ -38,6 +45,10 @@ export function GameResult() {
   useEffect(() => {
     if (gameKey === 'decode') {
       say('decode.sent')
+      return
+    }
+    if (gameKey === 'rant') {
+      say('rant.sent')
       return
     }
     if (!voiceRound || voiceRound.typedInstead || typedWpm === 0 || voiceWpm === 0) return
@@ -71,7 +82,8 @@ export function GameResult() {
     { mode: 'voice', label: voice.typedInstead ? 'Voice (typed)' : 'Voice' },
   ]
   const isDecode = def.key === 'decode'
-  const noun = isDecode ? 'description' : 'ideas'
+  const isRant = def.key === 'rant'
+  const noun = isDecode ? 'description' : isRant ? 'rant' : 'ideas'
   const maxWpm = Math.max(typed.metrics.wpm, voice.metrics.wpm, 1)
 
   async function save() {
@@ -109,7 +121,8 @@ export function GameResult() {
             )
           })}
           <p className="wa-note">
-            {!isDecode && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
+            {isRant && rantSummary(typed.metrics, voice.metrics)}
+            {!isDecode && !isRant && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
             {isDecode && `Words: ${typed.metrics.words} typed, ${voice.metrics.words} by voice.`}
             {voice.metrics.integrity === 'flagged' && !voice.typedInstead && ' Your voice round looked typed, so it is marked as flagged.'}
           </p>

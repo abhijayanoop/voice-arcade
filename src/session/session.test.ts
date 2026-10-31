@@ -165,6 +165,24 @@ describe('persisting rounds', () => {
 
     expect(api.descriptions()).toEqual([description])
   })
+
+  it('keeps a Rant round to its ratings, language mix and edit effort, with no text stored', async () => {
+    const api = createMemoryApi()
+    const session = createSession({ api })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    for (const game of ['brain_dump', 'decode'] as const) {
+      await session.completeRound(game, 'typed', metrics())
+      await session.completeRound(game, 'voice', metrics())
+    }
+
+    const answers = { lang_mix: 'Hinglish', sendable: 2, accuracy: 4 }
+    await session.completeRound('rant', 'voice', { ...metrics(), answers, extras: { edit_chars: 37 } })
+
+    const saved = api.rounds().find((r) => r.game === 'rant')
+    expect(saved).toMatchObject({ mode: 'voice', answers, extras: { edit_chars: 37 } })
+    expect(api.descriptions()).toEqual([])
+  })
 })
 
 describe('resuming from a personal link', () => {
