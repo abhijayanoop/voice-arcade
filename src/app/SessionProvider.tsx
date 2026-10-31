@@ -15,6 +15,7 @@ interface SessionContextValue {
   giveConsent(choice: { leaderboardOptIn: boolean }): Promise<void>
   resume(token: string): Promise<boolean>
   completeRound(game: GameKey, mode: Mode, metrics: RoundMetrics, description?: DescriptionSubmission): Promise<void>
+  recordAnswers(game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null)
@@ -67,6 +68,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         await session.completeRound(game, mode, metrics, description)
         refresh()
       },
+      recordAnswers: (game, mode, answers) => session.recordAnswers(game, mode, answers),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [session, view, restoring, token],

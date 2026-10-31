@@ -23,8 +23,8 @@ Outside Judge: shared link ─▶ Judge page ─▶ picks ─▶ done
 | `/ready` | 3a, 3b, 3c · Requirements | Popup over the page with three switchable tabs: what you need (tickable list), set up Flow (steps and a try-it box), how it works (and the "I'm in" confirmation, with a type-it-instead link) | `get_state` | `record_consent` |
 | `/lobby` | 4 · Lobby | Game cards with locked, next and done states; Speed race panel | `get_state`, `get_leaderboard` | none |
 | `/game/:key` | 5 · Game intro | What the game is; which mode comes first | `get_state` | none |
-| `/game/:key/typed`, `/game/:key/voice` | 6 · Keyboard round, 7 · Voice round and the game frames | The timed round | none | none until submit |
-| `/game/:key/result` | 8 · Round result and per-game frames | Typed versus voice, two quick questions | `get_state` | `submit_round` (both rounds, once complete) |
+| `/game/:key/typed`, `/game/:key/voice` | 6 · Keyboard round, 7 · Voice round and the game frames | The timed round | none | `submit_round` when the round is submitted |
+| `/game/:key/result` | 8 · Round result and per-game frames | Typed versus voice, two quick questions | `get_state` | `record_answers` (the two quick questions) |
 | `/done` | 9 · Arcade complete | Summary, podium, next step | `get_state`, `get_leaderboard` | `finish_arcade` |
 | `/quests` | 10 · Quest board | Day 1–3 quests, streak | `get_state` | `mark_quest` |
 | `/check-in` | 11 · Day 3 check-in | Upload streak card, enter streak days, total words, apps, built-in dictation answer | `get_state` | `submit_checkin`, storage upload |
@@ -41,7 +41,7 @@ Per-game frames: Decode, Rant, Juggler, Snippet. Brain dump uses the generic int
 - **Quiet mode**: while a round timer runs, Blip is docked and silent and the screen has no other motion.
 - **Resume**: the token is kept in the browser and in the link; a refresh or a return visit lands on the right step.
 - **Pay question**: the "would you pay" question appears only in the boss round, after the loss test.
-- **Typed alternative**: every voice step offers a "type it instead" link; the round is then recorded as typed.
+- **Typed alternative**: every voice step offers a "type it instead" link; the round is stored in the voice slot, flagged, with `typed_instead` in its answers (so the unique key holds), and the Result leaves it out of the voice comparison.
 - **Backdrop**: the playful background layer is on by default and can be switched to plain.
 
 ## Copy to add to the wireframes

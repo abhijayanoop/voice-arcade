@@ -42,7 +42,6 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
 
 .wa-lobby-grid { display: flex; flex-wrap: wrap; gap: var(--space-4); }
 .wa-lobby__state { font: 500 12px/16px var(--font-sans); text-transform: uppercase; letter-spacing: .5px; }
-.wa-dock { position: fixed; left: var(--space-6); bottom: var(--space-6); z-index: 5; pointer-events: none; }
 .wa-chip[aria-selected="true"] { background: var(--lavender); color: var(--lavender-ink); border-color: var(--lavender); }
 
 /* Room between each question and its options, so selection rings and focus glow never touch the text. */
@@ -51,3 +50,40 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
 .wa-field { gap: var(--space-2); }
 .wa-chips { gap: var(--space-3); padding-top: var(--space-1); }
 .wa-field .wa-row { gap: var(--space-3); padding: var(--space-2) var(--space-2) var(--space-1); }
+
+/* Blip runtime: docked bottom-left until a step sends it to a target or the Player drags it. */
+.wa-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wa-blip { position: fixed; left: var(--space-6); bottom: var(--space-6); z-index: 5; width: 56px; height: 56px; transition: left var(--blip-travel-duration) var(--blip-travel-ease), top var(--blip-travel-duration) var(--blip-travel-ease); }
+.wa-blip.is-dragging { transition: none; }
+.wa-blip__body { width: 56px; height: 56px; cursor: grab; touch-action: none; user-select: none; }
+.wa-blip.is-dragging .wa-blip__body { cursor: grabbing; }
+.wa-blip__body svg { animation: blip-face-in var(--blip-face-fade) ease-out; }
+.wa-blip__bubble { position: absolute; left: calc(100% + var(--space-3)); bottom: var(--space-2); width: max-content; pointer-events: none; }
+.wa-blip.is-flipped .wa-blip__bubble { left: auto; right: calc(100% + var(--space-3)); }
+.wa-blip.is-flipped .wa-blip__bubble::before { left: auto; right: -9px; transform: rotate(-135deg); }
+.wa-blip__body--celebrate, .wa-blip__body--hop { animation: blip-jump 600ms ease-out; }
+.wa-blip__body--squash { animation: blip-squash 300ms ease-out; }
+.wa-blip__body--spin { animation: blip-spin 700ms ease-in-out; }
+.wa-blip__body--fly { animation: blip-fly-in var(--blip-travel-duration) var(--blip-travel-ease); }
+@keyframes blip-face-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes blip-jump { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-18px); } }
+@keyframes blip-squash { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12, .88); } }
+@keyframes blip-spin { to { transform: rotate(360deg); } }
+@keyframes blip-fly-in { from { transform: translateY(80px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@media (max-width: 640px) { .wa-blip, .wa-blip__body { width: 44px; height: 44px; } }
+@media (prefers-reduced-motion: reduce) {
+  .wa-blip { transition: none; }
+  .wa-blip__body { animation: none; }
+  .wa-blip__body svg { animation: blip-face-in 150ms linear; }
+}
+
+/* Decode scenes: four lookalikes in a grid, the target outlined. */
+.wa-scenes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); }
+.wa-scene { position: relative; display: flex; flex-direction: column; gap: var(--space-2); background: var(--paper); border: 1.5px solid var(--cream-300); border-radius: var(--radius-md); padding: var(--space-2); font: inherit; color: var(--ink); text-align: left; }
+.wa-scene__svg { width: 100%; height: auto; border-radius: var(--radius-sm); display: block; }
+.wa-scene__tag { font: 600 13px/16px var(--font-sans); }
+.wa-scene.is-target { border-color: var(--lavender); box-shadow: 0 0 0 3px var(--lavender); }
+.wa-scene--pick { cursor: pointer; }
+.wa-scene--pick:hover:not(:disabled) { border-color: var(--ink); }
+.wa-scene--pick:focus-visible { outline: 3px solid var(--lavender); outline-offset: 3px; }
+.wa-scene--pick:disabled { opacity: .6; cursor: default; }

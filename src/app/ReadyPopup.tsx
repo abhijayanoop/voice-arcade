@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useBlip } from '../blip/BlipProvider'
 import { Chip } from '../ui/Chip'
 import { isIn } from '../ui/isIn'
 import { useSession } from './SessionProvider'
@@ -19,10 +20,14 @@ const NEEDS = [
   'About 20 minutes for the five games',
 ]
 
+/** How long the Try it box can stay empty before Blip asks whether Flow is running. */
+const FLOW_SILENT_MS = 20000
+
 const FOCUSABLE = 'button:not([disabled]), input, textarea, [tabindex]:not([tabindex="-1"])'
 
 export function ReadyPopup() {
   const { giveConsent } = useSession()
+  const { say } = useBlip()
   const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('need')
   const [ticked, setTicked] = useState<boolean[]>(NEEDS.map(() => false))
@@ -40,6 +45,17 @@ export function ReadyPopup() {
   useEffect(() => {
     tabRefs.current.need?.focus()
   }, [])
+
+  // Blip nudges the confirm step, and notices when Flow has stayed silent on the setup tab.
+  useEffect(() => {
+    if (tab === 'how') say('setup.say_im_in')
+  }, [tab, say])
+
+  useEffect(() => {
+    if (tab !== 'setup' || tryIt.trim()) return
+    const id = window.setTimeout(() => say('setup.flow_missing'), FLOW_SILENT_MS)
+    return () => window.clearTimeout(id)
+  }, [tab, tryIt, say])
 
   function selectTab(id: Tab) {
     setTab(id)
@@ -80,6 +96,7 @@ export function ReadyPopup() {
     setBusy(true)
     try {
       await giveConsent({ leaderboardOptIn: leaderboard })
+      say('setup.consent_done')
       navigate('/lobby', { replace: true })
     } finally {
       setBusy(false)
@@ -175,7 +192,7 @@ export function ReadyPopup() {
               <li>Results are published in aggregate under code names only.</li>
               <li>Streak card images stay private.</li>
             </ul>
-            <div className="wa-confirm">
+            <div className="wa-confirm" data-blip-target="confirm-box">
               <label className="wa-label" htmlFor="say-in">
                 Say or type
               </label>

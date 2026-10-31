@@ -20,7 +20,7 @@ Postgres on Supabase. Every table has row-level security enabled and no policy f
 
 ## RPC functions
 
-Implemented in `supabase/migrations/0001_voice_arcade.sql`. Parameters are prefixed `p_`. Code names are unique ignoring case. Token lookup is a helper in a separate `private` schema so it is not callable as an RPC. Failures raise `code_name_taken`, `unknown_token` or `unknown_description`. `get_state` returns camelCase JSON matching the `PlayerState` type in `src/api/types.ts`.
+Implemented in `supabase/migrations/0001_voice_arcade.sql` and `0002_record_answers.sql`. Parameters are prefixed `p_`. Code names are unique ignoring case. Token lookup is a helper in a separate `private` schema so it is not callable as an RPC. Failures raise `code_name_taken`, `unknown_token` or `unknown_description`. `get_state` returns camelCase JSON matching the `PlayerState` type in `src/api/types.ts`.
 
 | Function | Does |
 |---|---|
@@ -28,6 +28,7 @@ Implemented in `supabase/migrations/0001_voice_arcade.sql`. Parameters are prefi
 | `record_consent(token, leaderboard_opt_in)` | Sets `consented_at` and the opt-in |
 | `get_state(token)` | Returns the player, finished games and modes, quest days done, check-in and boss status |
 | `submit_round(token, round, description?)` | Inserts the round; idempotent on (player, game, mode); inserts the description when given |
+| `record_answers(token, game, mode, answers)` | Merges post-game answers into a saved round; metrics are untouched (migration `0002_record_answers.sql`) |
 | `finish_arcade(token)` | Sets `arcade_done_at` |
 | `get_leaderboard()` | Top ten opted-in players by best voice words per minute in Brain dump blitz: code name, avatar, wpm only |
 | `get_judge_batch(judge_key, n)` | Descriptions this Judge has not judged: id, text, scene set. Never returns mode, author or target |

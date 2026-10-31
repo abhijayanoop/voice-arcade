@@ -41,6 +41,13 @@ export interface DescriptionSubmission {
   text: string
 }
 
+/** What a Judge receives: never the mode, the author or the target. */
+export interface JudgeItem {
+  id: string
+  text: string
+  sceneSet: string
+}
+
 export interface PlayerState {
   player: PlayerProfile & { consented: boolean; leaderboardOptIn: boolean; arcadeDone: boolean }
   rounds: { game: GameKey; mode: Mode; modeOrder: 1 | 2 }[]
@@ -69,4 +76,10 @@ export interface Api {
   getState(token: string): Promise<PlayerState>
   /** Idempotent on (player, game, mode): a repeat is ignored. */
   submitRound(token: string, round: RoundSubmission, description?: DescriptionSubmission): Promise<void>
+  /** Merges answers into a saved round; the metrics stay as submitted. */
+  recordAnswers(token: string, game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
+  /** Up to n descriptions this Judge has not judged yet. No sign-up: the Judge is a random key kept in their browser. */
+  getJudgeBatch(judgeKey: string, n: number): Promise<JudgeItem[]>
+  /** One pick per (description, Judge); a repeat is ignored. */
+  submitJudgment(judgeKey: string, descriptionId: string, pickedScene: string): Promise<void>
 }

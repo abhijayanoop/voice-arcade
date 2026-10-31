@@ -3,6 +3,7 @@ import {
   CodeNameTakenError,
   UnknownTokenError,
   type Api,
+  type JudgeItem,
   type PlayerState,
 } from './types'
 
@@ -63,6 +64,19 @@ export function createSupabaseApi(url: string, publishableKey: string): Api {
           ? { scene_set: description.sceneSet, target_scene: description.targetScene, text: description.text }
           : null,
       })
+    },
+    async recordAnswers(token, game, mode, answers) {
+      await rpc('record_answers', { p_token: token, p_game: game, p_mode: mode, p_answers: answers })
+    },
+    async getJudgeBatch(judgeKey, n) {
+      const rows = await rpc<{ id: string; text: string; scene_set: string }[]>('get_judge_batch', {
+        p_judge_key: judgeKey,
+        p_n: n,
+      })
+      return rows.map((r): JudgeItem => ({ id: r.id, text: r.text, sceneSet: r.scene_set }))
+    },
+    async submitJudgment(judgeKey, descriptionId, pickedScene) {
+      await rpc('submit_judgment', { p_judge_key: judgeKey, p_description_id: descriptionId, p_picked_scene: pickedScene })
     },
   }
 }

@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom'
+import { useBlipOnMount } from '../blip/BlipProvider'
 import { BlipHero } from '../ui/Blip'
 
 export function Welcome() {
   const navigate = useNavigate()
+  useBlipOnMount('setup.first_visit')
   return (
     <main className="wa-page">
       <div className="wa-screen wa-screen--center">

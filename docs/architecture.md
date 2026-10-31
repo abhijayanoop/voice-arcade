@@ -63,7 +63,7 @@ The Blip line picker is small enough to cover with one seam-level test (no immed
 
 A round records `beforeinput` input types, key presses, paste events and timestamps on a plain textarea. Typed rounds block paste. Voice rounds allow insertion, because Flow may insert text by paste or by simulated typing. The integrity verdict is a soft flag: text that arrives almost entirely through key presses in a voice round, or through paste in a typed round, is flagged and kept.
 
-Words are whitespace-separated tokens. Words per minute uses the round's active time, from first input to last input or the timer end, whichever is first.
+Words are whitespace-separated tokens. Words per minute uses the round's active time, from the round start to the last input or the timer end, whichever is first. Both modes share this clock so the comparison is fair; speech precedes the text landing, so a first-input start would flatter voice.
 
 ## Game specifics
 

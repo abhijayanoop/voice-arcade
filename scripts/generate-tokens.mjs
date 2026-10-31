@@ -9,7 +9,7 @@ const add = (name, value) => lines.push(`  --${name}: ${resolve(value)};`)
 for (const t of tokens.color.tokens) add(t.name, t.value)
 add('font-display', tokens.type.families.display)
 add('font-sans', tokens.type.families.sans)
-for (const group of ['spacing', 'radius', 'shadow']) {
+for (const group of ['spacing', 'motion', 'radius', 'shadow']) {
   for (const t of tokens[group].tokens) add(t.name, t.value)
 }
 
