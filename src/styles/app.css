@@ -44,3 +44,10 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
 .wa-lobby__state { font: 500 12px/16px var(--font-sans); text-transform: uppercase; letter-spacing: .5px; }
 .wa-dock { position: fixed; left: var(--space-6); bottom: var(--space-6); z-index: 5; pointer-events: none; }
 .wa-chip[aria-selected="true"] { background: var(--lavender); color: var(--lavender-ink); border-color: var(--lavender); }
+
+/* Room between each question and its options, so selection rings and focus glow never touch the text. */
+.wa-card { gap: var(--space-8); }
+.wa-field > .wa-label, legend.wa-label { margin-bottom: var(--space-3); }
+.wa-field { gap: var(--space-3); }
+.wa-chips { gap: var(--space-3); padding-top: var(--space-1); }
+.wa-field .wa-row { gap: var(--space-4); padding: var(--space-2) var(--space-2) var(--space-1); }
