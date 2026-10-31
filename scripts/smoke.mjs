@@ -50,10 +50,33 @@ check('round submitted, and a repeat is accepted', !first.error && !again.error,
 const answered = await rpc('record_answers', { p_token: token, p_game: 'brain_dump', p_mode: 'voice', p_answers: { felt_natural: 4 } })
 check('answers are recorded on a saved round', !answered.error, JSON.stringify(answered.error))
 
+// Decode: a description stored with its scene set and target, then judged from a second browser (a fresh client).
+const description = `smoke description ${codeName}`
+const decodeRound = { ...round, game: 'decode', mode: 'typed', prompt_key: 'smoke_decode' }
+const described = await rpc('submit_round', {
+  p_token: token,
+  p_round: decodeRound,
+  p_description: { scene_set: 's1', target_scene: 's1-2', text: description },
+})
+check('decode round stored with its description', !described.error, JSON.stringify(described.error))
+
+const judge = createClient(url, publishableKey, { auth: { persistSession: false } })
+const judgeKey = `smoke-judge-${codeName}`
+const batch = await judge.rpc('get_judge_batch', { p_judge_key: judgeKey, p_n: 20 })
+const mine = (batch.data ?? []).find((d) => d.text === description)
+check('a second browser is served the description', Boolean(mine), JSON.stringify(batch.error ?? batch.data))
+check('the Judge receives only id, text and scene set', Object.keys(mine ?? {}).sort().join() === 'id,scene_set,text', JSON.stringify(mine))
+if (mine) {
+  const picked = await judge.rpc('submit_judgment', { p_judge_key: judgeKey, p_description_id: mine.id, p_picked_scene: 's1-2' })
+  check('judgment submitted', !picked.error, JSON.stringify(picked.error))
+  const after = await judge.rpc('get_judge_batch', { p_judge_key: judgeKey, p_n: 20 })
+  check('a judged description is not served again', !(after.data ?? []).some((d) => d.id === mine.id), JSON.stringify(after.data))
+}
+
 const state = await rpc('get_state', { p_token: token })
 const s = state.data
 check('state restores the Player', s?.player?.codeName === codeName && s.player.consented === true && s.player.leaderboardOptIn === true, JSON.stringify(state))
-check('state has exactly one round (idempotent)', s?.rounds?.length === 1 && s.rounds[0].modeOrder === 1, JSON.stringify(s?.rounds))
+check('state has exactly the two rounds submitted (idempotent)', s?.rounds?.length === 2 && s.rounds[0].modeOrder === 1, JSON.stringify(s?.rounds))
 
 const unknown = await rpc('get_state', { p_token: 'nope' })
 check('unknown token is rejected', unknown.error?.message.includes('unknown_token'), JSON.stringify(unknown.error))

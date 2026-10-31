@@ -3,9 +3,11 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useBlip, useBlipOnMount, useQuietWhile } from '../blip/BlipProvider'
 import { capture } from '../capture/capture'
 import { useRoundRecorder } from '../capture/useRoundRecorder'
-import type { RoundMetrics } from '../api/types'
+import type { DescriptionSubmission, RoundMetrics } from '../api/types'
 import { other } from '../games/modes'
 import { countIdeas, type GameKey } from '../games/registry'
+import { generateSceneSet, seedForMode } from '../scenes/scenes'
+import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
 import { useGame } from './GameIntro'
 import { useGameRun } from './GameRun'
@@ -30,7 +32,15 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   const { completeRound } = useSession()
   const navigate = useNavigate()
   const seconds = def!.seconds!
-  const prompt = def!.prompts![mode]
+  // State, not useMemo: the target must stay put for the whole round.
+  const [decode] = useState(() => {
+    if (gameKey !== 'decode') return null
+    const set = generateSceneSet(seedForMode(mode))
+    return { set, target: set.scenes[Math.floor(Math.random() * set.scenes.length)] }
+  })
+  const prompt = decode
+    ? { key: `decode_${decode.set.id}`, text: 'Describe the highlighted scene so a Judge can pick it from the lookalikes.' }
+    : def!.prompts![mode]
   const [phase, setPhase] = useState<Phase>('ready')
   const [left, setLeft] = useState(seconds)
   const [text, setText] = useState('')
@@ -87,7 +97,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
 
   async function submit() {
     if (text.trim() === '') {
-      setNotice('That is empty. Add at least one idea.')
+      setNotice(def!.emptyNotice ?? 'That is empty. Add something first.')
       say('round.empty_submit')
       return
     }
@@ -105,17 +115,28 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
       // A voice step typed instead is stored in the voice slot, flagged, so the (player, game, mode) key stays unique.
       integrity: typedInstead || captured.integrity === 'flagged' ? 'flagged' : 'ok',
       answers: typedInstead ? { typed_instead: true } : {},
-      extras: { idea_count: countIdeas(text), edit_chars: captured.editDistance },
+      extras: decode
+        ? { edit_chars: captured.editDistance }
+        : { idea_count: countIdeas(text), edit_chars: captured.editDistance },
     }
+    // The description is the one dictated text that is stored, with its scene set and target.
+    // A voice step typed instead is left out, so Judges never score typed text as voice.
+    const description: DescriptionSubmission | undefined = decode && !typedInstead
+      ? { sceneSet: decode.set.id, targetScene: decode.target.id, text: text.trim() }
+      : undefined
     setBusy(true)
     try {
-      await completeRound(gameKey, mode, metrics)
+      await completeRound(gameKey, mode, metrics, description)
     } catch {
       setNotice('That did not save. Try submitting again.')
       setBusy(false)
       return
     }
-    run.record(gameKey, mode, { metrics, typedInstead })
+    run.record(gameKey, mode, {
+      metrics,
+      typedInstead,
+      scenes: decode ? { setId: decode.set.id, targetId: decode.target.id } : undefined,
+    })
     navigate(secondRound ? `/game/${gameKey}/result` : `/game/${gameKey}/${other(mode)}`)
   }
 
@@ -128,15 +149,25 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
           <span className="wa-waves" role="timer" aria-label={`${left} seconds left`}>{left}s</span>
         </header>
         <h1 className="wa-heading">{prompt.text}</h1>
+        {decode && (
+          <div className="wa-scenes" data-blip-target="scenes">
+            {decode.set.scenes.map((scene) => (
+              <div key={scene.id} className={`wa-scene${scene.id === decode.target.id ? ' is-target' : ''}`}>
+                <SceneSvg scene={scene} label={scene.id === decode.target.id ? 'Highlighted scene: describe this one' : 'A lookalike scene'} />
+                {scene.id === decode.target.id && <span className="wa-scene__tag">Describe this one</span>}
+              </div>
+            ))}
+          </div>
+        )}
         {mode === 'voice' && (
           <div className={`wa-voice${phase === 'running' ? ' is-listening' : ''}`} data-blip-target="voice-input">
-            <span>Hold your Flow key and talk. Ideas, one per line.</span>
+            <span>{def!.voiceHint}</span>
           </div>
         )}
         <textarea
           ref={recorder.field}
           className="wa-input"
-          aria-label="Your ideas, one per line"
+          aria-label={def!.inputLabel}
           rows={8}
           value={text}
           readOnly={phase !== 'running'}

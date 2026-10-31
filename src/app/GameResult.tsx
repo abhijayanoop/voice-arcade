@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useBlip } from '../blip/BlipProvider'
+import { distinguishingDetails, sceneSetFromId } from '../scenes/scenes'
+import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
 import { Chip } from '../ui/Chip'
 import { useGame } from './GameIntro'
@@ -34,12 +36,16 @@ export function GameResult() {
 
   // Blip reacts to the same comparison the card shows, so its line never contradicts the numbers.
   useEffect(() => {
+    if (gameKey === 'decode') {
+      say('decode.sent')
+      return
+    }
     if (!voiceRound || voiceRound.typedInstead || typedWpm === 0 || voiceWpm === 0) return
     const ratio = voiceWpm / typedWpm
     if (ratio >= TIE_RATIO) say('result.voice_big_win', { x: ratio.toFixed(1) })
     else if (ratio <= 1 / TIE_RATIO) say('result.typed_win')
     else say('result.close')
-  }, [voiceRound, typedWpm, voiceWpm, say])
+  }, [gameKey, voiceRound, typedWpm, voiceWpm, say])
 
   if (!def || !def.playable || !status) return <Navigate to="/lobby" replace />
   const played = run.played(def.key)
@@ -64,6 +70,8 @@ export function GameResult() {
     { mode: 'typed', label: 'Typed' },
     { mode: 'voice', label: voice.typedInstead ? 'Voice (typed)' : 'Voice' },
   ]
+  const isDecode = def.key === 'decode'
+  const noun = isDecode ? 'description' : 'ideas'
   const maxWpm = Math.max(typed.metrics.wpm, voice.metrics.wpm, 1)
 
   async function save() {
@@ -101,10 +109,37 @@ export function GameResult() {
             )
           })}
           <p className="wa-note">
-            Ideas: {String(typed.metrics.extras.idea_count)} typed, {String(voice.metrics.extras.idea_count)} by voice.
+            {!isDecode && `Ideas: ${String(typed.metrics.extras.idea_count)} typed, ${String(voice.metrics.extras.idea_count)} by voice.`}
+            {isDecode && `Words: ${typed.metrics.words} typed, ${voice.metrics.words} by voice.`}
             {voice.metrics.integrity === 'flagged' && !voice.typedInstead && ' Your voice round looked typed, so it is marked as flagged.'}
           </p>
         </section>
+
+        {isDecode && (
+          <section className="wa-card" aria-label="Details to emphasise">
+            <h2 className="wa-heading">Details worth saying</h2>
+            <p className="wa-body">Judges now see your descriptions without your name or the mode. These details set each scene apart from its lookalikes.</p>
+            <div className="wa-scenes">
+              {rows.map(({ mode, label }) => {
+                const info = played[mode]!.scenes
+                const set = info && sceneSetFromId(info.setId)
+                const scene = set && set.scenes.find((s) => s.id === info.targetId)
+                if (!set || !scene) return null
+                return (
+                  <div key={mode} className="wa-scene is-target">
+                    <SceneSvg scene={scene} label={`${label} round target`} />
+                    <span className="wa-scene__tag">{label} round</span>
+                    <ul className="wa-note">
+                      {distinguishingDetails(set, scene.id).map((d) => (
+                        <li key={d.attr}>{d.label}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )}
 
         {!saved ? (
           <div className="wa-card">
@@ -117,7 +152,7 @@ export function GameResult() {
               </div>
             </fieldset>
             <fieldset className="wa-field">
-              <legend className="wa-label">Did the voice ideas feel like yours?</legend>
+              <legend className="wa-label">{`Did the voice ${noun} feel like yours?`}</legend>
               <div className="wa-chips">
                 {OWNERSHIP.map(({ value, label }) => (
                   <Chip key={value} pressed={ownership === value} onToggle={() => setOwnership(value)}>{label}</Chip>

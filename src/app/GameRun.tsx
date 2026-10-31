@@ -8,6 +8,8 @@ export interface PlayedRound {
   metrics: RoundMetrics
   /** A voice step the Player typed instead: stored in the voice slot, flagged, and left out of the voice comparison. */
   typedInstead: boolean
+  /** Decode only: the scene set shown and the target the Player described. */
+  scenes?: { setId: string; targetId: string }
 }
 
 interface GameRunValue {

@@ -76,3 +76,14 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
   .wa-blip__body { animation: none; }
   .wa-blip__body svg { animation: blip-face-in 150ms linear; }
 }
+
+/* Decode scenes: four lookalikes in a grid, the target outlined. */
+.wa-scenes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); }
+.wa-scene { position: relative; display: flex; flex-direction: column; gap: var(--space-2); background: var(--paper); border: 1.5px solid var(--cream-300); border-radius: var(--radius-md); padding: var(--space-2); font: inherit; color: var(--ink); text-align: left; }
+.wa-scene__svg { width: 100%; height: auto; border-radius: var(--radius-sm); display: block; }
+.wa-scene__tag { font: 600 13px/16px var(--font-sans); }
+.wa-scene.is-target { border-color: var(--lavender); box-shadow: 0 0 0 3px var(--lavender); }
+.wa-scene--pick { cursor: pointer; }
+.wa-scene--pick:hover:not(:disabled) { border-color: var(--ink); }
+.wa-scene--pick:focus-visible { outline: 3px solid var(--lavender); outline-offset: 3px; }
+.wa-scene--pick:disabled { opacity: .6; cursor: default; }
