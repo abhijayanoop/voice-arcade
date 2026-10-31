@@ -5,6 +5,7 @@ import { GameIntro } from './GameIntro'
 import { GameResult } from './GameResult'
 import { GameRound } from './GameRound'
 import { GameRunProvider } from './GameRun'
+import { JudgePage } from './JudgePage'
 import { Lobby } from './Lobby'
 import { NameScreen } from './NameScreen'
 import { PersonalLink } from './PersonalLink'
@@ -35,6 +36,7 @@ export function App() {
               <Route path="/game/:key" element={<Guard step="lobby"><GameIntro /></Guard>} />
               <Route path="/game/:key/result" element={<Guard step="lobby"><GameResult /></Guard>} />
               <Route path="/game/:key/:mode" element={<Guard step="lobby"><GameRound /></Guard>} />
+              <Route path="/judge" element={<JudgePage />} />
               <Route path="/spike" element={<Spike />} />
               <Route path="/p/:token" element={<PersonalLink />} />
               <Route path="*" element={<Navigate to="/" replace />} />

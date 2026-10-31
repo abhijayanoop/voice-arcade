@@ -17,6 +17,10 @@ export interface GameDef {
   /** Round length in seconds, for timed games. */
   seconds?: number
   explainer?: string
+  /** Round screen copy that differs by game. */
+  inputLabel?: string
+  voiceHint?: string
+  emptyNotice?: string
   /** A different prompt for each mode, so the two rounds never repeat. */
   prompts?: Record<Mode, Prompt>
 }
@@ -35,6 +39,9 @@ export const GAMES: GameDef[] = [
     card: 'tomato',
     playable: true,
     seconds: 60,
+    inputLabel: 'Your ideas, one per line',
+    voiceHint: 'Hold your Flow key and talk. Ideas, one per line.',
+    emptyNotice: 'That is empty. Add at least one idea.',
     explainer:
       'You get sixty seconds and a silly prompt. List as many ideas as you can, one per line. You play it twice: once typing, once talking to Flow.',
     prompts: {
@@ -42,7 +49,19 @@ export const GAMES: GameDef[] = [
       voice: { key: 'bd_voice_1', text: 'Invent new uses for a broken umbrella.' },
     },
   },
-  { key: 'decode', title: 'Describe to decode', blurb: 'Describe a scene so Judges can pick it', card: 'mustard', playable: false },
+  {
+    key: 'decode',
+    title: 'Describe to decode',
+    blurb: '90 sec · describe a scene so Judges can pick it',
+    card: 'mustard',
+    playable: true,
+    seconds: 90,
+    inputLabel: 'Your description of the highlighted scene',
+    voiceHint: 'Hold your Flow key and describe the highlighted scene.',
+    emptyNotice: 'That is empty. Describe the highlighted scene first.',
+    explainer:
+      'You see four near-identical scenes and one is highlighted. Describe it so an outside Judge could pick it out from the lookalikes. Your description is shown to Judges anonymously. You play it twice: once typing, once talking to Flow, each with a different scene.',
+  },
   { key: 'rant', title: 'Rant to sendable', blurb: 'Vent, then make it sendable', card: 'lavender', playable: false },
   { key: 'juggler', title: 'The juggler', blurb: 'Reply while you catch things', card: 'sage', playable: false },
   { key: 'snippet', title: 'Explain the snippet', blurb: 'Explain code, count the jargon', card: 'tomato', playable: false },
