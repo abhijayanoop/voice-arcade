@@ -69,4 +69,6 @@ export interface Api {
   getState(token: string): Promise<PlayerState>
   /** Idempotent on (player, game, mode): a repeat is ignored. */
   submitRound(token: string, round: RoundSubmission, description?: DescriptionSubmission): Promise<void>
+  /** Merges answers into a saved round; the metrics stay as submitted. */
+  recordAnswers(token: string, game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
 }

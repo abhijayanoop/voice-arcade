@@ -64,6 +64,11 @@ export function createMemoryApi(): MemoryApi {
       roundsByToken.set(token, [...rounds, round])
       if (description) descriptionList.push(description)
     },
+    async recordAnswers(token, game, mode, answers) {
+      find(token)
+      const round = (roundsByToken.get(token) ?? []).find((r) => r.game === game && r.mode === mode)
+      if (round) round.answers = { ...round.answers, ...answers }
+    },
     players: () => [...store.values()].map((p) => ({ ...p })),
     rounds: () => [...roundsByToken.values()].flat(),
     descriptions: () => [...descriptionList],

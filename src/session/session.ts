@@ -17,6 +17,8 @@ export interface GameView {
   key: GameKey
   status: GameStatus
   firstMode: Mode
+  /** Modes already saved, so a refresh resumes at the missing round. */
+  doneModes: Mode[]
 }
 
 export interface SessionView {
@@ -24,6 +26,8 @@ export interface SessionView {
   player: { codeName: string; avatar: number } | null
   registerError: 'code_name_taken' | null
   games: GameView[]
+  /** One wave per finished round. */
+  waves: number
 }
 
 export interface Session {
@@ -40,6 +44,8 @@ export interface Session {
     metrics: RoundMetrics,
     description?: DescriptionSubmission,
   ): Promise<void>
+  /** Adds the post-game answers to a round already saved. */
+  recordAnswers(game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
 }
 
 export function createSession({
@@ -59,21 +65,25 @@ export function createSession({
   const completedModes = new Map<GameKey, Set<Mode>>()
   const isDone = (key: GameKey) => completedModes.get(key)?.size === 2
 
+  const wavesEarned = () => [...completedModes.values()].reduce((sum, modes) => sum + modes.size, 0)
+
+  const modesDone = (key: GameKey): Mode[] => [...(completedModes.get(key) ?? [])]
+
   function games(): GameView[] {
     let nextAssigned = false
     return GAMES.map(({ key }) => {
       const firstMode = firstModes.get(key)!
-      if (isDone(key)) return { key, status: 'done', firstMode }
+      if (isDone(key)) return { key, status: 'done', firstMode, doneModes: modesDone(key) }
       if (!nextAssigned) {
         nextAssigned = true
-        return { key, status: 'next', firstMode }
+        return { key, status: 'next', firstMode, doneModes: modesDone(key) }
       }
-      return { key, status: 'locked', firstMode }
+      return { key, status: 'locked', firstMode, doneModes: modesDone(key) }
     })
   }
 
   return {
-    view: () => ({ step, player, registerError, games: games() }),
+    view: () => ({ step, player, registerError, games: games(), waves: wavesEarned() }),
     token: () => token,
     async register(profile) {
       try {
@@ -120,6 +130,10 @@ export function createSession({
       const modeOrder = mode === firstModes.get(game) ? 1 : 2
       await api.submitRound(token, { ...metrics, game, mode, modeOrder }, description)
       completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
+    },
+    async recordAnswers(game, mode, answers) {
+      if (!token) throw new Error('register before playing')
+      await api.recordAnswers(token, game, mode, answers)
     },
   }
 }
