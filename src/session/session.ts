@@ -24,6 +24,8 @@ export interface SessionView {
   player: { codeName: string; avatar: number } | null
   registerError: 'code_name_taken' | null
   games: GameView[]
+  /** One wave per finished round. */
+  waves: number
 }
 
 export interface Session {
@@ -59,6 +61,8 @@ export function createSession({
   const completedModes = new Map<GameKey, Set<Mode>>()
   const isDone = (key: GameKey) => completedModes.get(key)?.size === 2
 
+  const wavesEarned = () => [...completedModes.values()].reduce((sum, modes) => sum + modes.size, 0)
+
   function games(): GameView[] {
     let nextAssigned = false
     return GAMES.map(({ key }) => {
@@ -73,7 +77,7 @@ export function createSession({
   }
 
   return {
-    view: () => ({ step, player, registerError, games: games() }),
+    view: () => ({ step, player, registerError, games: games(), waves: wavesEarned() }),
     token: () => token,
     async register(profile) {
       try {

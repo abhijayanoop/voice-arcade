@@ -227,3 +227,22 @@ describe('resuming from a personal link', () => {
     expect(session.token()).toBeNull()
   })
 })
+
+describe('waves', () => {
+  it('earns one wave per completed round, ignores locked games, and restores them on resume', async () => {
+    const api = createMemoryApi()
+    const session = createSession({ api })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    expect(session.view().waves).toBe(0)
+
+    await session.completeRound('brain_dump', 'typed', metrics())
+    expect(session.view().waves).toBe(1)
+    await session.completeRound('rant', 'typed', metrics())
+    expect(session.view().waves).toBe(1)
+
+    const after = createSession({ api })
+    await after.resume(session.token()!)
+    expect(after.view().waves).toBe(1)
+  })
+})
