@@ -54,10 +54,15 @@ export function GameResult() {
       return
     }
     if (gameKey === 'juggler' && voiceRound && !voiceRound.typedInstead && typedRound) {
-      if (Number(voiceRound.metrics.extras.caught) > Number(typedRound.metrics.extras.caught)) say('juggler.voice_caught_more')
-      else if (Number(typedRound.metrics.extras.dropped) >= 3) say('juggler.dropped_three')
-      else say('result.close')
-      return
+      // Only the two juggler lines that the catch counts back up; otherwise fall through to the speed reaction below.
+      if (Number(voiceRound.metrics.extras.caught) > Number(typedRound.metrics.extras.caught)) {
+        say('juggler.voice_caught_more')
+        return
+      }
+      if (Number(typedRound.metrics.extras.dropped) >= 3 && Number(voiceRound.metrics.extras.dropped) < Number(typedRound.metrics.extras.dropped)) {
+        say('juggler.dropped_three')
+        return
+      }
     }
     if (gameKey === 'rant') {
       say('rant.sent')

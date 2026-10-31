@@ -91,13 +91,19 @@ export interface RubricHits {
   hits: number
 }
 
-const PLACE = /\b(?:at|in|near|outside|inside|by)\s+the\b|\b(?:caf[eé]|office|station|park|home|house|room|library|restaurant|bar|pub|mall|campus|gym|school|hotel|airport|street|lobby|entrance|floor|building|downtown|venue|place)\b/i
+const PLACE = /\b(?:caf[eé]|office|station|park|home|house|room|library|restaurant|bar|pub|mall|campus|gym|school|hotel|airport|street|lobby|entrance|floor|building|downtown|venue|place)\b/i
 const TIME = /\b\d{1,2}(?::\d{2})?\s?(?:am|pm)\b|\b\d{1,2}:\d{2}\b|o['’]?clock|\b(?:noon|midnight|tonight|tomorrow|today|morning|afternoon|evening|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i
-const WHO = /\b(?:with|bring|bringing|invite|inviting|joining|joins|coming|everyone|everybody|team|friends?|colleagues?|boss|manager|we|he|she|they)\b/i
+const WHO = /\b(?:bring|bringing|invite|inviting|joining|joins|everyone|everybody|team|friends?|colleagues?|boss|manager)\b/i
+/** Capitalised words that are not names: days and months. */
+const NOT_NAMES = new Set([
+  'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+  'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
+])
 
 /** A capitalised word in mid-sentence reads as a name; the opening word of a sentence and "I" do not. */
 function hasName(text: string): boolean {
-  return /(?<![.!?]\s)(?<!^)\b(?!I\b)[A-Z][a-z]+\b/.test(text.trim())
+  const words = text.trim().match(/(?<![.!?]\s)(?<!^)\b(?!I\b)[A-Z][a-z]+\b/g) ?? []
+  return words.some((w) => !NOT_NAMES.has(w.toLowerCase()))
 }
 
 /**

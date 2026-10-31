@@ -135,6 +135,11 @@ describe('rubricHits', () => {
     expect(rubricHits('')).toMatchObject({ hits: 0 })
   })
 
+  it('does not count everyday words as a place or a who', () => {
+    expect(rubricHits('Sounds good, we will see how it goes. At the moment I am busy.')).toMatchObject({ place: false, who: false })
+    expect(rubricHits('See you on Friday').who).toBe(false)
+  })
+
   it('does not take a sentence-opening word or the pronoun I for a name', () => {
     expect(rubricHits('Great. Sure. I will be there.').who).toBe(false)
   })
