@@ -99,5 +99,17 @@ export const GAMES: GameDef[] = [
       voice: { key: 'jg_voice_1', text: 'Message: "The team offsite is happening. Tell me where to be, when to arrive, and who is joining."' },
     },
   },
-  { key: 'snippet', title: 'Explain the snippet', blurb: 'Explain code, count the jargon', card: 'tomato', playable: false },
+  {
+    key: 'snippet',
+    title: 'Explain the snippet',
+    blurb: '75 sec · explain code, count the jargon',
+    card: 'tomato',
+    playable: true,
+    seconds: 75,
+    inputLabel: 'Your explanation of the code',
+    voiceHint: 'Hold your Flow key and explain the code out loud, technical terms and all.',
+    emptyNotice: 'That is empty. Explain what the code does first.',
+    explainer:
+      'You see a short piece of code and seventy-five seconds to explain what it does, as if to a teammate. Afterwards you see which technical terms made it through, so you can tell where voice struggles with jargon. You play it twice: once typing, once talking to Flow, each with a different snippet.',
+  },
 ]

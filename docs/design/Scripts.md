@@ -41,6 +41,8 @@ Every event Blip reacts to, with its expression, move, target and line variants.
 | `juggler.voice_caught_more` | cheering | celebrate | "Hands free, apples saved. That is the whole point." · "More caught while talking. Your mouse hand says thanks." |
 | `rant.edit` | pointing | perch → `answer-input` | "Rant over. Now make it something you could actually send." · "Steam released. Time for the grown-up edit." |
 | `rant.sent` | cheeky | celebrate | "Rant filed, never sent. Healthy." · "Your words stay in this browser. Only the numbers leave." |
+| `snippet.voice_missed` | oops | hop on dock | "Flow tripped over the jargon. Check which terms went missing." · "Code words are hard to say out loud. Look at what got lost." |
+| `snippet.voice_kept` | cheering | celebrate | "Flow kept your jargon intact. Impressive." · "Technical terms survived the trip from mouth to screen." |
 
 ## Results
 

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useBlip, useBlipOnMount, useQuietWhile } from '../blip/BlipProvider'
-import { capture, editDistance, rubricHits, type CaptureMetrics } from '../capture/capture'
+import { capture, editDistance, jargonHits, rubricHits, type CaptureMetrics } from '../capture/capture'
 import { useRoundRecorder } from '../capture/useRoundRecorder'
 import type { DescriptionSubmission, RoundMetrics } from '../api/types'
 import { other } from '../games/modes'
 import { countIdeas, LANG_MIXES, type GameKey } from '../games/registry'
+import { SNIPPETS } from '../games/snippets'
 import { generateSceneSet, seedForMode } from '../scenes/scenes'
 import { SceneSvg } from '../scenes/SceneSvg'
 import type { Mode } from '../session/session'
@@ -56,7 +57,10 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
     const set = generateSceneSet(seedForMode(mode))
     return { set, target: set.scenes[Math.floor(Math.random() * set.scenes.length)] }
   })
-  const prompt = decode
+  const snippet = gameKey === 'snippet' ? SNIPPETS[mode] : null
+  const prompt = snippet
+    ? { key: snippet.key, text: 'Explain what this code does, as if to a teammate.' }
+    : decode
     ? { key: `decode_${decode.set.id}`, text: 'Describe the highlighted scene so a Judge can pick it from the lookalikes.' }
     : def!.prompts![mode]
   const [phase, setPhase] = useState<Phase>('ready')
@@ -150,6 +154,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
       return
     }
     const captured = raw?.captured ?? capture(recorder.finish(text))
+    const jargon = snippet ? jargonHits(text, snippet.terms) : null
     const metrics: RoundMetrics = {
       promptKey: prompt.key,
       startedAt: startedAt.current,
@@ -170,7 +175,9 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
         ? { edit_chars: captured.editDistance }
         : isRant
           ? { edit_chars: editDistance(raw!.text, text) }
-          : isJuggler
+          : snippet
+            ? { jargon_hits: jargon!.hits.length, jargon_total: jargon!.total }
+            : isJuggler
             ? { caught: score.current.caught, dropped: score.current.dropped, rubric_hits: rubricHits(text).hits }
             : { idea_count: countIdeas(text), edit_chars: captured.editDistance },
     }
@@ -190,6 +197,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
     run.record(gameKey, mode, {
       metrics,
       typedInstead,
+      jargon: jargon?.hits,
       scenes: decode ? { setId: decode.set.id, targetId: decode.target.id } : undefined,
     })
     navigate(secondRound ? `/game/${gameKey}/result` : `/game/${gameKey}/${other(mode)}`)
@@ -204,6 +212,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
           <span className="wa-waves" role="timer" aria-label={`${left} seconds left`}>{left}s</span>
         </header>
         <h1 className="wa-heading">{prompt.text}</h1>
+        {snippet && <pre className="wa-code" tabIndex={0} aria-label="Code to explain"><code>{snippet.code}</code></pre>}
         {isJuggler && <JugglerField running={phase === 'running'} score={score} />}
         {decode && (
           <div className="wa-scenes" data-blip-target="scenes">

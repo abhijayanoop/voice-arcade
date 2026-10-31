@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { capture, rubricHits, type RoundLog } from './capture'
+import { capture, jargonHits, rubricHits, type RoundLog } from './capture'
 
 // Worked by hand: six keystrokes at 1000, 1200 ... 2000 ms spell "hi all".
 // The clock runs from the round start in both modes: 2 words in 2000 ms = 1/30 min -> 60 wpm.
@@ -147,5 +147,31 @@ describe('rubricHits', () => {
   it('reads clock times written with a colon or o\'clock', () => {
     expect(rubricHits('18:30 works').time).toBe(true)
     expect(rubricHits('around seven o\'clock').time).toBe(true)
+  })
+})
+
+describe('jargonHits', () => {
+  const terms = ['closure', 'callback', 'setTimeout', 'debounce']
+
+  it('lists the terms found and the total', () => {
+    expect(jargonHits('It uses a closure and a callback.', terms)).toEqual({ hits: ['closure', 'callback'], total: 4 })
+  })
+
+  it('is case-sensitive, so a mangled capital is a miss', () => {
+    expect(jargonHits('it calls settimeout later', terms).hits).toEqual([])
+    expect(jargonHits('it calls setTimeout later', terms).hits).toEqual(['setTimeout'])
+  })
+
+  it('needs the whole term, not a piece of a longer word', () => {
+    expect(jargonHits('callbacks are fine, debounced too', terms).hits).toEqual([])
+    expect(jargonHits('a (callback) wrapped, debounce.', terms).hits).toEqual(['callback', 'debounce'])
+  })
+
+  it('counts a term once however often it is said', () => {
+    expect(jargonHits('closure closure closure', terms).hits).toEqual(['closure'])
+  })
+
+  it('finds nothing in empty text', () => {
+    expect(jargonHits('', terms)).toEqual({ hits: [], total: 4 })
   })
 })
