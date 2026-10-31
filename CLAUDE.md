@@ -22,6 +22,7 @@ Read `CONTEXT.md` before naming anything. Read the ADRs in `docs/adr/` before to
 - Dictated text stays in the browser, except Decode descriptions. Everything else stores metrics.
 - The Supabase service key lives only in local scripts. The browser bundle holds the public URL and publishable key.
 - `package.json` scripts are the source of truth for commands. Run typecheck and tests before each commit.
+- Always work on a new branch, never directly on `main`. When the work is done and everything is committed, raise a pull request for it.
 
 ## Agent skills
 
