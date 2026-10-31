@@ -98,10 +98,24 @@ describe('mode order', () => {
     expect(firstModes(() => draws.shift() ?? 0)).toEqual(['typed', 'voice', 'typed', 'voice', 'typed'])
   })
 
-  it('keeps each game first mode stable across views', () => {
-    const session = createSession({ api: createMemoryApi() })
-    expect(session.view().games.map((g) => g.firstMode)).toEqual(
-      session.view().games.map((g) => g.firstMode),
-    )
+  it('keeps each game first mode fixed while the Player moves through the arcade', async () => {
+    // A random source that never repeats: any re-draw on a later view would change the modes.
+    let n = 0
+    const session = createSession({ api: createMemoryApi(), random: () => (n++ * 0.37) % 1 })
+    const before = session.view().games.map((g) => g.firstMode)
+
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    session.completeRound('brain_dump', 'typed')
+
+    expect(session.view().games.map((g) => g.firstMode)).toEqual(before)
+  })
+
+  it('always yields typed or voice with the real random source, and uses both across Players', () => {
+    const seen = new Set<string>()
+    for (let i = 0; i < 200; i++) {
+      for (const mode of firstModes(Math.random)) seen.add(mode)
+    }
+    expect([...seen].sort()).toEqual(['typed', 'voice'])
   })
 })

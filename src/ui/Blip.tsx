@@ -12,8 +12,7 @@ export function BlipDock() {
 export function BlipHero() {
   return (
     <div
-      className="blip blip--bob"
-      style={{ width: 160, height: 160 }}
+      className="blip blip--bob blip--hero"
       dangerouslySetInnerHTML={{ __html: idleSvg }}
     />
   )

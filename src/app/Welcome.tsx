@@ -22,7 +22,7 @@ export function Welcome() {
             One tiny quest a day, in the work you already do.
           </li>
           <li>
-            <strong>Come back on day 3</strong>
+            <strong>Check in on day 3</strong>
             Share your streak card and face one last boss round.
           </li>
         </ol>
