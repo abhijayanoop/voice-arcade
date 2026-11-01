@@ -13,7 +13,7 @@ export function Thanks() {
 
   const { waves, questsDone, streak } = view.totals
   return (
-    <main className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">Thank you, {name}</h1>
         <section className="wa-card" aria-label="Your totals">

@@ -31,7 +31,7 @@ export function Lobby() {
   }, [doneCount, nextNumber, say])
 
   return (
-    <main className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <header className="wa-hud">
           <span className="wa-hud__round">Lobby</span>

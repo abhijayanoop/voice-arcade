@@ -16,6 +16,7 @@ import { QuestBoard } from './QuestBoard'
 import { ReadyPopup } from './ReadyPopup'
 import { ROUTE_FOR_PHASE, ROUTE_FOR_STEP } from './routes'
 import { SessionProvider, useSession } from './SessionProvider'
+import { Backdrop } from '../ui/Backdrop'
 import { Spike } from './Spike'
 import { Thanks } from './Thanks'
 import { Welcome } from './Welcome'
@@ -43,6 +44,8 @@ export function App() {
       <BlipProvider>
         <GameRunProvider>
           <BrowserRouter>
+            <a className="wa-skip" href="#main">Skip to content</a>
+            <Backdrop />
             <Routes>
               <Route path="/" element={<Welcome />} />
               <Route path="/name" element={<Guard step="register"><NameScreen /></Guard>} />

@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { APPLE_SIZE, BASKET_SIZE, FIELD, newJuggler, stepJuggler } from '../games/juggler'
 
+/** How far one arrow-key press moves the basket, in field pixels. */
+const KEY_STEP = 24
+
 export interface JugglerScore {
   caught: number
   dropped: number
@@ -53,10 +56,17 @@ export function JugglerField({ running, score }: { running: boolean; score: Reac
       className="wa-juggler"
       width={FIELD.width}
       height={FIELD.height}
-      role="img"
-      aria-label="Catching game: move the mouse to catch the falling apples"
+      role="application"
+      aria-label="Catching game: move the mouse, drag a finger or use the left and right arrow keys to catch the falling apples"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+        e.preventDefault()
+        const step = e.key === 'ArrowLeft' ? -KEY_STEP : KEY_STEP
+        basketX.current = Math.min(Math.max(basketX.current + step, 0), FIELD.width)
+      }}
       data-blip-target="juggler-field"
-      onMouseMove={(e) => {
+      onPointerMove={(e) => {
         const box = e.currentTarget.getBoundingClientRect()
         basketX.current = ((e.clientX - box.left) / box.width) * FIELD.width
       }}

@@ -25,7 +25,7 @@ export function ArcadeDone() {
   })
 
   return (
-    <main className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">Arcade complete</h1>
         <p className="wa-gain" data-blip-target="waves">{view.waves} waves earned</p>
