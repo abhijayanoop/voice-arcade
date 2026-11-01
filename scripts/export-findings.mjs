@@ -15,12 +15,18 @@ if (!url || !serviceKey) {
 const client = createClient(url, serviceKey, { auth: { persistSession: false } })
 
 async function all(table, columns) {
-  const { data, error } = await client.from(table).select(columns)
-  if (error) {
-    console.error(`Reading ${table} failed: ${error.message}`)
-    process.exit(1)
+  // Page through the table: Supabase caps a single read at 1000 rows and truncates silently.
+  const PAGE = 1000
+  const rows = []
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await client.from(table).select(columns).range(from, from + PAGE - 1)
+    if (error) {
+      console.error(`Reading ${table} failed: ${error.message}`)
+      process.exit(1)
+    }
+    rows.push(...data)
+    if (data.length < PAGE) return rows
   }
-  return data ?? []
 }
 
 // Only the columns the aggregates need: never token, code_name, description text or screenshot paths.
