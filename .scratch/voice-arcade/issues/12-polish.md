@@ -4,7 +4,7 @@
 
 **Blocked by:** 04, 05, 06, 07, 08, 09, 10
 
-**Status:** ready-for-agent
+**Status:** in-review
 
 - [ ] A backdrop toggle switches between playful and plain and remembers the choice
 - [ ] Animations and Blip movement are reduced or off when the Player prefers reduced motion

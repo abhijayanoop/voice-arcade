@@ -56,7 +56,7 @@ export function JugglerField({ running, score }: { running: boolean; score: Reac
       className="wa-juggler"
       width={FIELD.width}
       height={FIELD.height}
-      role="img"
+      role="application"
       aria-label="Catching game: move the mouse, drag a finger or use the left and right arrow keys to catch the falling apples"
       tabIndex={0}
       onKeyDown={(e) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const KEY = 'voice-arcade.backdrop'
 export type BackdropChoice = 'playful' | 'plain'
@@ -49,13 +49,14 @@ function PlayfulLayer() {
 export function Backdrop() {
   const [choice, setChoice] = useState<BackdropChoice>(readChoice)
 
-  useEffect(() => {
+  function choose(next: BackdropChoice) {
+    setChoice(next)
     try {
-      window.localStorage.setItem(KEY, choice)
+      window.localStorage.setItem(KEY, next)
     } catch {
       // Private mode: the choice lasts for this visit only.
     }
-  }, [choice])
+  }
 
   const playful = choice === 'playful'
   return (
@@ -65,7 +66,7 @@ export function Backdrop() {
         type="button"
         className="wa-btn wa-btn--ghost wa-backdrop-toggle"
         aria-pressed={playful}
-        onClick={() => setChoice(playful ? 'plain' : 'playful')}
+        onClick={() => choose(playful ? 'plain' : 'playful')}
       >
         Playful backdrop: {playful ? 'on' : 'off'}
       </button>

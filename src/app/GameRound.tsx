@@ -204,7 +204,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   }
 
   return (
-    <main id="main" className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <header className="wa-hud">
           <span className="wa-hud__round">{mode === 'typed' ? 'Keyboard round' : 'Voice round'}</span>

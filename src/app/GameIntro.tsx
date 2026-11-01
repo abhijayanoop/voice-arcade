@@ -20,7 +20,7 @@ export function GameIntro() {
   const target = status.doneModes.includes(first) ? other(first) : first
 
   return (
-    <main id="main" className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">{def.title}</h1>
         <p className="wa-body">{def.explainer}</p>

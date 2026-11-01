@@ -75,7 +75,7 @@ export function CheckIn() {
     setApps((current) => (current.includes(app) ? current.filter((a) => a !== app) : [...current, app]))
 
   return (
-    <main id="main" className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <form className="wa-screen" onSubmit={submit}>
         <h1 className="wa-title">Day 3 check-in</h1>
         <div className="wa-card">

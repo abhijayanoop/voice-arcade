@@ -84,7 +84,7 @@ export function Boss() {
   }
 
   return (
-    <main id="main" className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">Final boss</h1>
         {!questions ? (

@@ -71,7 +71,7 @@ export function JudgePage() {
   }
 
   return (
-    <main id="main" className="wa-page">
+    <main id="main" tabIndex={-1} className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">Be a Judge</h1>
         <p className="wa-body">
