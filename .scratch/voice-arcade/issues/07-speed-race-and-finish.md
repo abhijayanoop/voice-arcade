@@ -4,10 +4,10 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The podium shows only Players who opted in; a Player who did not opt in never appears
-- [ ] The podium ranks speed using real data from saved rounds
-- [ ] Finishing the arcade shows a summary of the Player's typed-versus-voice results
-- [ ] Waves are awarded for finishing rounds
-- [ ] The finish screen points the Player to their personal link and the quest board
+- [x] The podium shows only Players who opted in; a Player who did not opt in never appears
+- [x] The podium ranks speed using real data from saved rounds
+- [x] Finishing the arcade shows a summary of the Player's typed-versus-voice results
+- [x] Waves are awarded for finishing rounds
+- [x] The finish screen points the Player to their personal link and the quest board

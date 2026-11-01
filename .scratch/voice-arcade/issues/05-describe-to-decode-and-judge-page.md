@@ -4,12 +4,12 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Scenes are generated deterministically from a small catalogue and render as inline SVG
-- [ ] Each round shows one target scene with its scene set; typed and voice rounds use different targets
-- [ ] The description is stored with its scene set and target; no other round text is stored
-- [ ] The Judge page is a public route that serves a description and four scenes, with no mode, author or target exposed in what the Judge receives
-- [ ] A Judge is shown only descriptions they have not judged yet
-- [ ] A judgment submitted from a second browser is saved and readable
-- [ ] The result screen and Blip events for the game are in place
+- [x] Scenes are generated deterministically from a small catalogue and render as inline SVG
+- [x] Each round shows one target scene with its scene set; typed and voice rounds use different targets
+- [x] The description is stored with its scene set and target; no other round text is stored
+- [x] The Judge page is a public route that serves a description and four scenes, with no mode, author or target exposed in what the Judge receives
+- [x] A Judge is shown only descriptions they have not judged yet
+- [x] A judgment submitted from a second browser is saved and readable
+- [x] The result screen and Blip events for the game are in place

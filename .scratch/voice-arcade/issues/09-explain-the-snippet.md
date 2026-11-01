@@ -4,10 +4,10 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Each snippet has a term list; typed and voice rounds use different snippets
-- [ ] Hits are exact, case-sensitive matches in the text
-- [ ] Hits and total are saved with the round metrics
-- [ ] The result screen shows which terms were hit in each mode
-- [ ] Blip events for the game are in place
+- [x] Each snippet has a term list; typed and voice rounds use different snippets
+- [x] Hits are exact, case-sensitive matches in the text
+- [x] Hits and total are saved with the round metrics
+- [x] The result screen shows which terms were hit in each mode
+- [x] Blip events for the game are in place

@@ -4,13 +4,13 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** code done, human steps pending
 
-- [ ] The migration creates the tables, access rules, backend functions and the private insert-only streak-cards bucket as specified in the data model
-- [ ] A Supabase adapter implements the same Api interface as the in-memory one
-- [ ] Registering stores the code name, avatar, cohort, operating system, language mix, consent and leaderboard choice; a taken code name returns a clear error
-- [ ] Opening the personal link restores the Player's progress through the Session module (resume)
-- [ ] Session tests cover resume and the persisted calls against the in-memory Api
-- [ ] A smoke script registers a Player, submits a round and reads state back against a real project
+- [x] The migration creates the tables, access rules, backend functions and the private insert-only streak-cards bucket as specified in the data model
+- [x] A Supabase adapter implements the same Api interface as the in-memory one
+- [x] Registering stores the code name, avatar, cohort, operating system, language mix, consent and leaderboard choice; a taken code name returns a clear error
+- [x] Opening the personal link restores the Player's progress through the Session module (resume)
+- [x] Session tests cover resume and the persisted calls against the in-memory Api
+- [x] A smoke script registers a Player, submits a round and reads state back against a real project
 - [ ] The SPA is deployed with a catch-all rewrite; the browser bundle holds only the public URL and publishable key
 - [ ] Human steps (project, keys, migration, bucket, Vercel variables) are done, guided by a wizard script

@@ -4,14 +4,14 @@
 
 **Blocked by:** 02
 
-**Status:** ready-for-agent
+**Status:** code done, spike findings pending
 
 - [ ] The spike page logs input types, key presses, paste events and timestamps, and the findings are noted so the integrity check can be set as a flag or informational
-- [ ] The Capture module returns words, characters, active time, words per minute, keystrokes, pastes, inserts, edit distance and an integrity verdict from a recorded input log
-- [ ] Capture tests use typed, paste-dictated, keystroke-dictated and mixed logs, with expected values worked out by hand
-- [ ] Typed rounds block paste; voice rounds allow insertion; mismatched rounds are flagged but kept
-- [ ] Ideas are counted as non-empty lines
-- [ ] The result screen compares typed and voice honestly and records the post-game questions
-- [ ] Submitting the same round twice is harmless (unique per Player, game and mode)
-- [ ] A full game is saved to Supabase with metrics and no dictated text
-- [ ] The Lobby updates (game done, next game unlocked) and the first wave is earned for finishing a round
+- [x] The Capture module returns words, characters, active time, words per minute, keystrokes, pastes, inserts, edit distance and an integrity verdict from a recorded input log
+- [x] Capture tests use typed, paste-dictated, keystroke-dictated and mixed logs, with expected values worked out by hand
+- [x] Typed rounds block paste; voice rounds allow insertion; mismatched rounds are flagged but kept
+- [x] Ideas are counted as non-empty lines
+- [x] The result screen compares typed and voice honestly and records the post-game questions
+- [x] Submitting the same round twice is harmless (unique per Player, game and mode)
+- [x] A full game is saved to Supabase with metrics and no dictated text
+- [x] The Lobby updates (game done, next game unlocked) and the first wave is earned for finishing a round

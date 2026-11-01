@@ -4,10 +4,10 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Catching and replying work at the same time
-- [ ] Typed and voice rounds use different messages, with randomised first mode and a type-it-instead option
-- [ ] Caught, dropped and words are saved
-- [ ] The rubric hit count comes from simple keyword matching and is labelled approximate
-- [ ] The result screen compares typed and voice and Blip events for the game are in place
+- [x] Catching and replying work at the same time
+- [x] Typed and voice rounds use different messages, with randomised first mode and a type-it-instead option
+- [x] Caught, dropped and words are saved
+- [x] The rubric hit count comes from simple keyword matching and is labelled approximate
+- [x] The result screen compares typed and voice and Blip events for the game are in place
