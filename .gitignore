@@ -6,3 +6,4 @@ src/styles/tokens.css
 !.env.example
 
 findings.json
+.playwright-mcp/
