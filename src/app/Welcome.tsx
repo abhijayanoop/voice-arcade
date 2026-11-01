@@ -6,7 +6,7 @@ export function Welcome() {
   const navigate = useNavigate()
   useBlipOnMount('setup.first_visit')
   return (
-    <main className="wa-page">
+    <main id="main" className="wa-page">
       <div className="wa-screen wa-screen--center">
         <BlipHero />
         <h1 className="wa-title">Voice Arcade</h1>

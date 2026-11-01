@@ -1,0 +1,595 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img "Elcarreira Interviewer logo" [ref=e7]
+          - generic [ref=e8]: Elcarreira Interviewer
+        - navigation [ref=e9]:
+          - link "Features" [ref=e10] [cursor=pointer]:
+            - /url: "#features"
+          - link "How it works" [ref=e11] [cursor=pointer]:
+            - /url: "#how"
+          - link "Pricing" [ref=e12] [cursor=pointer]:
+            - /url: "#pricing"
+          - link "FAQ" [ref=e13] [cursor=pointer]:
+            - /url: "#faq"
+        - generic [ref=e14]:
+          - link "Log in" [ref=e15] [cursor=pointer]:
+            - /url: "#"
+          - link "Sign up free" [ref=e16] [cursor=pointer]:
+            - /url: "#signup"
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e21]: New
+          - text: Voice mock interviews with live follow-ups
+        - heading "Practise like it's real. Know when you're ready." [level=1] [ref=e22]
+        - paragraph [ref=e23]: AI mock interviews built from your resume or the career you want. Feedback that quotes your own answers, and a plan to fix them.
+        - generic [ref=e24]:
+          - link "Sign up free" [ref=e25] [cursor=pointer]:
+            - /url: "#signup"
+          - link "See a sample report" [ref=e26] [cursor=pointer]:
+            - /url: "#report"
+        - generic [ref=e27]: Free plan · no card needed · cancel in one tap
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]: Live · Software engineer
+          - generic [ref=e37]:
+            - generic [ref=e38]: Q2 of 6
+            - generic [ref=e39]: 12:40
+        - generic [ref=e40]:
+          - generic [ref=e41]: AI
+          - generic [ref=e42]: Walk me through your final-year project. What part did you own?
+        - generic [ref=e76]: CAPTIONSSo I built an attendance app for our department using React and…
+        - generic [ref=e77]:
+          - generic [ref=e78]: Pause
+          - generic [ref=e79]: Done answering
+    - generic [ref=e81]:
+      - generic [ref=e82]:
+        - generic [ref=e83]: Who it's for
+        - heading "For anyone with an interview coming up" [level=2] [ref=e84]
+        - paragraph [ref=e85]: Pick your stage. The interview adapts to it.
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e90]:
+              - generic [ref=e91]: "Photo: fresher preparing for a first interview"
+              - generic:
+                - button "Replace"
+                - button "Edit"
+            - generic: Freshers
+            - generic: "01"
+          - generic [ref=e98]:
+            - heading "Landing your first job" [level=3] [ref=e99]
+            - paragraph [ref=e100]: Campus rounds, HR basics and the questions every first interview asks.
+            - generic [ref=e101]:
+              - generic [ref=e102]: Campus rounds
+              - generic [ref=e103]: HR basics
+              - generic [ref=e104]: Aptitude talk-through
+            - generic [ref=e105]:
+              - generic [ref=e106]: Practise a campus round
+              - generic [ref=e107]: →
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e111]:
+              - generic [ref=e112]: "Photo: student practising with a laptop"
+              - generic:
+                - button "Replace"
+                - button "Edit"
+            - generic: Students
+            - generic: "02"
+          - generic [ref=e119]:
+            - heading "Internships and grad roles" [level=3] [ref=e120]
+            - paragraph [ref=e121]: Questions built on your projects, so you can explain the work you did.
+            - generic [ref=e122]:
+              - generic [ref=e123]: Project deep-dives
+              - generic [ref=e124]: Internships
+              - generic [ref=e125]: Technical rounds
+            - generic [ref=e126]:
+              - generic [ref=e127]: Practise from your projects
+              - generic [ref=e128]: →
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e132]:
+              - generic [ref=e133]: "Photo: professional on a video interview"
+              - generic:
+                - button "Replace"
+                - button "Edit"
+            - generic: Professionals
+            - generic: "03"
+          - generic [ref=e140]:
+            - heading "Making the next move" [level=3] [ref=e141]
+            - paragraph [ref=e142]: Switching role or company? Practise the interview for the step up.
+            - generic [ref=e143]:
+              - generic [ref=e144]: Role switch
+              - generic [ref=e145]: Leadership stories
+              - generic [ref=e146]: Salary talk
+            - generic [ref=e147]:
+              - generic [ref=e148]: Practise for the step up
+              - generic [ref=e149]: →
+    - generic [ref=e151]:
+      - generic [ref=e152]:
+        - generic [ref=e153]: Two ways to start
+        - heading "Pick how your interview is built" [level=2] [ref=e154]
+        - paragraph [ref=e155]: Both lead to the same report, plan and Readiness Score. Try them below.
+      - generic [ref=e156]:
+        - generic [ref=e157]:
+          - generic [ref=e159]:
+            - heading "From your resume" [level=3] [ref=e160]
+            - paragraph [ref=e161]: Upload a PDF. Questions dig into your projects, internships and skills.
+          - generic [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e164]: PDF
+              - generic [ref=e165]:
+                - generic [ref=e166]: resume_2026.pdf
+                - generic [ref=e167]: Scanning projects and skills…
+              - generic [ref=e168]: Reading…
+            - generic [ref=e171]:
+              - generic [ref=e172]: SAMPLE QUESTION
+              - generic [ref=e173] [cursor=pointer]: ↻ Try another resume
+        - generic [ref=e174]:
+          - generic [ref=e176]:
+            - heading "From a career you want" [level=3] [ref=e177]
+            - paragraph [ref=e178]: Choose a role and company type. Practise what that interview really asks.
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - generic [ref=e181] [cursor=pointer]: Software eng.
+              - generic [ref=e182] [cursor=pointer]: Data analyst
+              - generic [ref=e183] [cursor=pointer]: Product
+              - generic [ref=e184] [cursor=pointer]: Marketing
+              - generic [ref=e185] [cursor=pointer]: Finance
+              - generic [ref=e186] [cursor=pointer]: Design
+            - generic [ref=e187]:
+              - generic [ref=e188] [cursor=pointer]: Product co.
+              - generic [ref=e189] [cursor=pointer]: Service co.
+              - generic [ref=e190] [cursor=pointer]: Startup
+            - generic [ref=e191]:
+              - generic [ref=e192]:
+                - generic [ref=e193]: SAMPLE QUESTION
+                - generic [ref=e194]: Technical round · 3 follow-ups
+              - paragraph [ref=e195]: Design a URL shortener. How would it handle a sudden 10× spike?
+    - generic [ref=e198]:
+      - generic [ref=e199]:
+        - generic [ref=e200]: How it works
+        - heading "Practise, see why, fix it, prove it" [level=2] [ref=e201]
+        - paragraph [ref=e202]: Keep scrolling to walk through each step.
+      - generic [ref=e206]:
+        - generic [ref=e208]:
+          - generic [aria-hidden] [ref=e209]: "01"
+          - generic [ref=e213]: Goal
+          - heading "Set your goal" [level=3] [ref=e214]
+          - paragraph [ref=e215]: Upload your resume or pick a role, company type and interview date.
+        - generic [ref=e217]:
+          - generic [aria-hidden] [ref=e218]: "02"
+          - generic [ref=e223]: Mock
+          - heading "Take a mock" [level=3] [ref=e224]
+          - paragraph [ref=e225]: A voice interview with follow-ups, or a quick 2-minute drill.
+        - generic [ref=e227]:
+          - generic [aria-hidden] [ref=e228]: "03"
+          - generic [ref=e233]: Report
+          - heading "Get your report" [level=3] [ref=e234]
+          - paragraph [ref=e235]: Readiness Score, skill scores and the quotes behind them.
+        - generic [ref=e237]:
+          - generic [aria-hidden] [ref=e238]: "04"
+          - generic [ref=e245]: Re-test
+          - heading "Fix and re-test" [level=3] [ref=e246]
+          - paragraph [ref=e247]: Work through the plan, then re-test to prove the score moved.
+    - generic [ref=e249]:
+      - generic [ref=e250]:
+        - generic [ref=e251]: Live interview
+        - heading "An interviewer that listens and follows up" [level=2] [ref=e252]
+        - paragraph [ref=e253]: 20–30 minute voice mocks with 2–3 follow-ups per answer. Short on time? Take a 2-minute drill instead.
+        - generic [ref=e254]:
+          - generic [ref=e255] [cursor=pointer]:
+            - generic [ref=e256]: Full mock
+            - generic [ref=e258]: HR and technical rounds, scored end to end.
+          - generic [ref=e259] [cursor=pointer]:
+            - generic [ref=e260]: Quick drill
+            - generic [ref=e262]: One question, instant score, retry.
+      - generic [ref=e263]:
+        - generic [ref=e264]: 2–3 follow-ups per answer
+        - generic [ref=e265]: Live captions
+        - generic [ref=e267]:
+          - generic [ref=e268]:
+            - generic [ref=e269]: HR round
+            - generic [ref=e271]:
+              - generic [ref=e272]: Q4 of 6
+              - generic [ref=e273]: 08:12
+          - generic [ref=e274]:
+            - generic [ref=e275]: AI
+            - generic [ref=e276]: Tell me about a time you disagreed with a teammate.
+          - generic [ref=e277]: Listening
+    - generic [ref=e320]:
+      - generic [ref=e321]:
+        - generic [ref=e322]:
+          - generic [ref=e323]:
+            - generic [ref=e324]: "REPORT · #0427"
+            - generic [ref=e325]: Software engineer mock
+            - generic [ref=e326]: Oct 27 · 24 min · 6 questions
+          - generic [ref=e327]:
+            - generic [ref=e328]:
+              - generic [ref=e329]: Developing
+              - generic [ref=e330]: 7 pts to Nearly ready
+            - generic [ref=e331]: "0"
+        - generic [ref=e336]:
+          - generic [ref=e337] [cursor=pointer]:
+            - text: Skills
+            - generic [ref=e338]: "5"
+          - generic [ref=e339] [cursor=pointer]:
+            - text: Transcript
+            - generic [ref=e340]: "6"
+          - generic [ref=e341] [cursor=pointer]:
+            - text: Delivery
+            - generic [ref=e342]: "4"
+        - generic [ref=e344]:
+          - generic [ref=e345]:
+            - generic [ref=e346]: SKILL
+            - generic [ref=e348]: /10
+            - generic [ref=e349]: VS LAST
+          - generic [ref=e352] [cursor=pointer]:
+            - generic [ref=e353]: Communication
+            - generic [ref=e355]: "7.2"
+            - generic [ref=e356]: "+0.8"
+            - generic [ref=e357]: ▾
+          - generic [ref=e358]:
+            - generic [ref=e359] [cursor=pointer]:
+              - generic [ref=e360]:
+                - text: Structure
+                - generic [ref=e361]: WEAKEST
+              - generic [ref=e363]: "4.8"
+              - generic [ref=e364]: −0.4
+              - generic [ref=e365]: ▾
+            - generic [ref=e366]:
+              - generic [ref=e367]:
+                - generic [ref=e368]:
+                  - generic [ref=e369]: YOU SAID
+                  - generic [ref=e370]: Q2 · 03:05
+                - text: "\"We just did it as a team and it worked out.\""
+              - generic [ref=e371]:
+                - generic [ref=e372]: STRONGER
+                - text: "\"As lead, I split the work into 3 sprints, which cut delivery by 2 weeks.\""
+              - generic [ref=e373]:
+                - generic [ref=e374] [cursor=pointer]: Redo this answer
+                - generic [ref=e375]: ▶ Play clip
+                - generic [ref=e376]: "Fix: use STAR on behavioural answers"
+          - generic [ref=e378] [cursor=pointer]:
+            - generic [ref=e379]: Technical depth
+            - generic [ref=e381]: "6.1"
+            - generic [ref=e382]: "+0.3"
+            - generic [ref=e383]: ▾
+          - generic [ref=e385] [cursor=pointer]:
+            - generic [ref=e386]: Confidence
+            - generic [ref=e388]: "5.5"
+            - generic [ref=e389]: "+1.1"
+            - generic [ref=e390]: ▾
+          - generic [ref=e392] [cursor=pointer]:
+            - generic [ref=e393]: Role knowledge
+            - generic [ref=e395]: "6.6"
+            - generic [ref=e396]: "0.0"
+            - generic [ref=e397]: ▾
+        - generic [ref=e398]:
+          - generic [ref=e399]: "Plan ready: 4 tasks · 17 min"
+          - generic [ref=e400] [cursor=pointer]: Start my plan
+      - generic [ref=e401]:
+        - generic [ref=e402]: Feedback report
+        - heading "Feedback that quotes you, not a checklist" [level=2] [ref=e403]
+        - paragraph [ref=e404]: A score for each skill, the exact sentence behind it, and a stronger version of your own answer. Then redo it on the spot.
+        - generic [ref=e405]:
+          - generic [ref=e406]: 5 skill scores
+          - generic [ref=e407]: Timestamped quotes
+          - generic [ref=e408]: Rewritten answers
+    - generic [ref=e411]:
+      - generic [ref=e412]:
+        - generic [ref=e413]: Learning plan
+        - heading "Every report ends with a plan" [level=2] [ref=e414]
+        - paragraph [ref=e415]: Short lessons and drills for your top gaps, spaced over the days before your interview. A re-test at the end shows what changed.
+        - paragraph [ref=e416]: Tick a task to try it.
+      - generic [ref=e418]:
+        - generic [ref=e419]:
+          - generic [ref=e420]: This week's plan
+          - generic [ref=e421]: Interview in 9 days
+        - generic [ref=e422]:
+          - generic [ref=e423]:
+            - generic [ref=e424]: M
+            - generic [ref=e425]: "27"
+          - generic [ref=e426]:
+            - generic [ref=e427]: T
+            - generic [ref=e428]: "28"
+          - generic [ref=e429]:
+            - generic [ref=e430]: W
+            - generic [ref=e431]: "29"
+          - generic [ref=e432]:
+            - generic [ref=e433]: T
+            - generic [ref=e434]: "30"
+          - generic [ref=e435]:
+            - generic [ref=e436]: F
+            - generic [ref=e437]: "31"
+          - generic [ref=e438]:
+            - generic [ref=e439]: S
+            - generic [ref=e440]: "1"
+          - generic [ref=e441]:
+            - generic [ref=e442]: S
+            - generic [ref=e443]: "2"
+        - generic [ref=e444]: 25%
+        - generic [ref=e448]:
+          - generic [ref=e449] [cursor=pointer]:
+            - generic [ref=e450]: ✓
+            - generic [ref=e451]: "Lesson: the STAR method"
+            - generic [ref=e452]: Lesson
+            - generic [ref=e453]: 3 min
+          - generic [ref=e454] [cursor=pointer]:
+            - generic [ref=e456]: "Drill: tell me about a conflict"
+            - generic [ref=e457]: Drill
+            - generic [ref=e458]: 2 min
+          - generic [ref=e459] [cursor=pointer]:
+            - generic [ref=e461]: Redo Q2 from your last mock
+            - generic [ref=e462]: Redo
+            - generic [ref=e463]: 2 min
+          - generic [ref=e464] [cursor=pointer]:
+            - generic [ref=e466]: "Re-test: structure and depth"
+            - generic [ref=e467]: Re-test
+            - generic [ref=e468]: 10 min
+    - generic [ref=e470]:
+      - generic [ref=e471]:
+        - generic [ref=e472]: Progress
+        - heading "Watch the number move" [level=2] [ref=e473]
+        - paragraph [ref=e474]: One Readiness Score tracks you over time. Rewards go to getting better, not just showing up.
+      - generic [ref=e475]:
+        - generic [ref=e476]:
+          - generic [ref=e477]:
+            - generic [ref=e478]:
+              - heading "Readiness Score" [level=3] [ref=e479]
+              - generic [ref=e480]:
+                - generic [ref=e481]: "0"
+                - generic [ref=e482]: "+19"
+            - generic [ref=e483]:
+              - generic [ref=e484] [cursor=pointer]: 2W
+              - generic [ref=e485] [cursor=pointer]: 4W
+              - generic [ref=e486] [cursor=pointer]: 8W
+          - generic [ref=e491]:
+            - generic [ref=e492]: Not ready
+            - generic [ref=e495]: Developing
+            - generic [ref=e498]: Nearly ready
+            - generic [ref=e501]: Placement ready
+            - generic [ref=e504]: Interview ace
+        - generic [ref=e507]:
+          - generic [ref=e508]:
+            - generic [ref=e511]:
+              - generic [ref=e513]:
+                - generic [ref=e514]: LEVEL
+                - generic [ref=e515]: "7"
+              - generic [ref=e516]:
+                - generic [ref=e517]: Interview Strategist
+                - generic [ref=e518]:
+                  - generic [ref=e519]: 0 XP
+                  - generic [ref=e520]: 1,500
+              - generic [ref=e522]:
+                - generic [ref=e525]: "0"
+                - generic [ref=e526]: day streak
+            - generic [ref=e527]:
+              - generic [ref=e528]:
+                - generic [ref=e529]: ✓
+                - generic [ref=e530]: M
+              - generic [ref=e531]:
+                - generic [ref=e532]: ✓
+                - generic [ref=e533]: T
+              - generic [ref=e534]:
+                - generic [ref=e535]: ✓
+                - generic [ref=e536]: W
+              - generic [ref=e537]:
+                - generic [ref=e538]: ✓
+                - generic [ref=e539]: T
+              - generic [ref=e540]: F
+              - generic [ref=e543]: S
+              - generic [ref=e546]: S
+          - generic [ref=e550]:
+            - generic [ref=e551] [cursor=pointer]: League
+            - generic [ref=e552] [cursor=pointer]: Quests
+            - generic [ref=e553] [cursor=pointer]: Badges
+          - generic [ref=e555]:
+            - generic [ref=e556]:
+              - generic [ref=e557]: Gold league
+              - generic [ref=e559]: Resets in 3d 4h
+            - generic [ref=e560]:
+              - generic [ref=e561]: "2"
+              - generic [ref=e562]: PS
+              - generic [ref=e563]: Priya S.
+              - generic [ref=e564]: 1,480
+              - generic [ref=e565]: ▲1
+            - generic [ref=e566]:
+              - generic [ref=e567]: "3"
+              - generic [ref=e568]: AK
+              - generic [ref=e569]: Arjun K.
+              - generic [ref=e570]: 1,390
+              - generic [ref=e571]: ▼1
+            - generic [ref=e572]:
+              - generic [ref=e573]: "4"
+              - generic [ref=e574]: ME
+              - generic [ref=e575]: You
+              - generic [ref=e576]: "0"
+              - generic [ref=e577]: ▲3
+            - generic [ref=e578]:
+              - generic [ref=e579]: "5"
+              - generic [ref=e580]: MT
+              - generic [ref=e581]: Meera T.
+              - generic [ref=e582]: 1,180
+              - generic [ref=e583]: —
+            - generic [ref=e584]:
+              - generic [ref=e585]: "6"
+              - generic [ref=e586]: KV
+              - generic [ref=e587]: Karthik V.
+              - generic [ref=e588]: 1,105
+              - generic [ref=e589]: ▼2
+            - generic [ref=e590]: Top 5 move up to Diamond
+  - generic [ref=e594]:
+    - generic [ref=e595]:
+      - generic [ref=e596]: Testimonials
+      - heading "Practice that showed up on the day" [level=2] [ref=e597]
+    - generic [ref=e598]:
+      - generic [ref=e599]:
+        - generic [aria-hidden] [ref=e600]: "\""
+        - generic [ref=e601]:
+          - generic [ref=e602]: Structure 4 → 8
+          - paragraph [ref=e603]: "\"It caught that my project answers had no numbers in them. A week of drills later, my structure score doubled.\""
+        - generic [ref=e604]:
+          - generic [ref=e605]: AR
+          - generic [ref=e606]:
+            - generic [ref=e607]: Ananya R.
+            - generic [ref=e608]: Fresher · Software engineer
+      - generic [ref=e609]:
+        - generic [aria-hidden] [ref=e610]: "\""
+        - generic [ref=e611]:
+          - generic [ref=e612]: Cleared 2 rounds
+          - paragraph [ref=e613]: "\"The follow-ups felt like a real panel. It kept asking why until I actually knew my own project.\""
+        - generic [ref=e614]:
+          - generic [ref=e615]: RM
+          - generic [ref=e616]:
+            - generic [ref=e617]: Rahul M.
+            - generic [ref=e618]: Final-year student · Data analyst
+      - generic [ref=e619]:
+        - generic [aria-hidden] [ref=e620]: "\""
+        - generic [ref=e621]:
+          - generic [ref=e622]: Readiness +21
+          - paragraph [ref=e623]: "\"I went from Developing to Nearly ready in three weeks, then cleared two product rounds.\""
+        - generic [ref=e624]:
+          - generic [ref=e625]: SK
+          - generic [ref=e626]:
+            - generic [ref=e627]: Sneha K.
+            - generic [ref=e628]: Professional · Product manager
+  - generic [ref=e630]:
+    - generic [ref=e631]:
+      - generic [ref=e632]: Pricing
+      - heading "Start free. Upgrade for interview season." [level=2] [ref=e633]
+      - generic [ref=e634]:
+        - generic [ref=e635] [cursor=pointer]: Monthly
+        - generic [ref=e636] [cursor=pointer]:
+          - text: 3-month pass
+          - generic [ref=e637]: Save 20%
+    - generic [ref=e638]:
+      - generic [ref=e639]:
+        - generic [ref=e640]:
+          - heading "Free" [level=3] [ref=e642]
+          - paragraph [ref=e643]: Try it and see your first score.
+        - generic [ref=e644]:
+          - generic [ref=e645]: ₹0
+          - generic [ref=e646]: forever
+        - generic [ref=e647] [cursor=pointer]: Sign up free
+        - generic [ref=e648]:
+          - generic [ref=e649]:
+            - generic [ref=e650]: ✓
+            - generic [ref=e651]: 1 full mock a week (3 a month)
+          - generic [ref=e652]:
+            - generic [ref=e653]: ✓
+            - generic [ref=e654]: 5 drills a day
+          - generic [ref=e655]:
+            - generic [ref=e656]: ✓
+            - generic [ref=e657]: Score and top 3 gaps
+          - generic [ref=e658]:
+            - generic [ref=e659]: ✓
+            - generic [ref=e660]: First week of your plan
+      - generic [ref=e661]:
+        - generic [ref=e662]:
+          - generic [ref=e663]:
+            - heading "Plus" [level=3] [ref=e664]
+            - generic [ref=e665]: Most popular
+          - paragraph [ref=e666]: For an active interview season.
+        - generic [ref=e667]:
+          - generic [ref=e668]: ₹249
+          - generic [ref=e669]: per month
+        - generic [ref=e670] [cursor=pointer]: Get Plus
+        - generic [ref=e671]:
+          - generic [ref=e672]:
+            - generic [ref=e673]: ✓
+            - generic [ref=e674]: 3 full mocks a week (10 a month)
+          - generic [ref=e675]:
+            - generic [ref=e676]: ✓
+            - generic [ref=e677]: Unlimited drills
+          - generic [ref=e678]:
+            - generic [ref=e679]: ✓
+            - generic [ref=e680]: Full report with stronger answers
+          - generic [ref=e681]:
+            - generic [ref=e682]: ✓
+            - generic [ref=e683]: Full adaptive plan
+          - generic [ref=e684]:
+            - generic [ref=e685]: ✓
+            - generic [ref=e686]: Readiness certificate
+      - generic [ref=e687]:
+        - generic [ref=e688]:
+          - heading "Pro" [level=3] [ref=e690]
+          - paragraph [ref=e691]: For high-stakes, back-to-back rounds.
+        - generic [ref=e692]:
+          - generic [ref=e693]: ₹599
+          - generic [ref=e694]: per month
+        - generic [ref=e695] [cursor=pointer]: Get Pro
+        - generic [ref=e696]:
+          - generic [ref=e697]:
+            - generic [ref=e698]: ✓
+            - generic [ref=e699]: 7 full mocks a week (25 a month)
+          - generic [ref=e700]:
+            - generic [ref=e701]: ✓
+            - generic [ref=e702]: All role and company packs
+          - generic [ref=e703]:
+            - generic [ref=e704]: ✓
+            - generic [ref=e705]: Coding rounds and personas
+          - generic [ref=e706]:
+            - generic [ref=e707]: ✓
+            - generic [ref=e708]: AI coach chat
+    - paragraph [ref=e709]: Pay with UPI or card. Need one more mock before the big day? Top up a single credit for ₹49.
+  - generic [ref=e711]:
+    - generic [ref=e712]:
+      - generic [ref=e713]: FAQ
+      - heading "Questions, answered" [level=2] [ref=e714]
+      - paragraph [ref=e715]:
+        - text: Something else?
+        - link "Write to us" [ref=e716] [cursor=pointer]:
+          - /url: "#"
+        - text: .
+    - generic [ref=e717]:
+      - generic [ref=e718]:
+        - generic [ref=e719] [cursor=pointer]:
+          - generic [ref=e720]: How are questions picked from my resume?
+          - generic [ref=e721]: +
+        - paragraph [ref=e722]: We read your projects, internships and skills, then ask about what you actually did. Follow-ups adapt to your answers.
+      - generic [ref=e724] [cursor=pointer]:
+        - generic [ref=e725]: I already work. Is this for me?
+        - generic [ref=e726]: +
+      - generic [ref=e728] [cursor=pointer]:
+        - generic [ref=e729]: Can I answer in Hindi or mixed English?
+        - generic [ref=e730]: +
+      - generic [ref=e732] [cursor=pointer]:
+        - generic [ref=e733]: Is this a live-interview copilot?
+        - generic [ref=e734]: +
+      - generic [ref=e736] [cursor=pointer]:
+        - generic [ref=e737]: What counts as one mock?
+        - generic [ref=e738]: +
+      - generic [ref=e740] [cursor=pointer]:
+        - generic [ref=e741]: Can I cancel anytime?
+        - generic [ref=e742]: +
+  - generic [ref=e744]:
+    - heading "Your next interview, practised first" [level=2] [ref=e745]
+    - paragraph [ref=e746]: Set up in two minutes. No card needed.
+    - link "Sign up free" [ref=e747] [cursor=pointer]:
+      - /url: "#"
+  - contentinfo [ref=e748]:
+    - generic [ref=e749]:
+      - generic [ref=e750]:
+        - generic [ref=e751]:
+          - generic [ref=e752]: Elcarreira Interviewer
+          - generic [ref=e753]: Practice only. We never assist during real interviews.
+        - generic [ref=e754]:
+          - generic [ref=e755]: Product
+          - generic [ref=e756]: Features
+          - generic [ref=e757]: Pricing
+          - generic [ref=e758]: Sample report
+        - generic [ref=e759]:
+          - generic [ref=e760]: Company
+          - generic [ref=e761]: About
+          - generic [ref=e762]: Contact
+          - generic [ref=e763]: Careers
+        - generic [ref=e764]:
+          - generic [ref=e765]: Legal
+          - generic [ref=e766]: Privacy
+          - generic [ref=e767]: Terms
+          - generic [ref=e768]: Refunds
+      - generic [ref=e769]: © 2026 Elcarreira

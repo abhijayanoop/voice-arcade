@@ -33,7 +33,7 @@ export function Spike() {
   const report = lines.map((l) => `${l.t}ms ${l.text}`).join('\n')
 
   return (
-    <main className="wa-page">
+    <main id="main" className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-heading">Input spike: how does text arrive?</h1>
         <p className="wa-body">

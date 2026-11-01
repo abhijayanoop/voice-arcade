@@ -83,7 +83,7 @@ export function NameScreen() {
     )
 
   return (
-    <main className="wa-page">
+    <main id="main" className="wa-page">
       <form className="wa-screen" onSubmit={submit}>
         <h1 className="wa-heading">Pick your code name</h1>
         <div className="wa-card">

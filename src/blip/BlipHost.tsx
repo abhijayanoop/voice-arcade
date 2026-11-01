@@ -77,6 +77,12 @@ export function BlipHost() {
     setTyped('')
     setVisible(scene.line !== '')
     if (scene.line === '') return
+    // Reduced motion: the whole line shows at once instead of typing out.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTyped(scene.line)
+      const hideNow = window.setTimeout(() => setVisible(false), HIDE_MS)
+      return () => window.clearTimeout(hideNow)
+    }
     let shown = 0
     let hide = 0
     const type = window.setInterval(() => {

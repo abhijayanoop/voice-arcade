@@ -35,7 +35,7 @@ export function QuestBoard() {
   }
 
   return (
-    <main className="wa-page">
+    <main id="main" className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">Quest board</h1>
         <p className="wa-gain" aria-live="polite">

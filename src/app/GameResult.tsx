@@ -125,7 +125,7 @@ export function GameResult() {
   }
 
   return (
-    <main className="wa-page">
+    <main id="main" className="wa-page">
       <div className="wa-screen">
         <h1 className="wa-title">{def.title}: result</h1>
         <section className="wa-result" aria-label="Typed versus voice" data-blip-target="result-card">

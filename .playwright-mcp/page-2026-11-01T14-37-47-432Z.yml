@@ -1,0 +1,24 @@
+- generic [ref=f2e2]:
+  - link "Skip to content" [ref=f2e3] [cursor=pointer]:
+    - /url: "#main"
+  - 'button "Playful backdrop: on" [pressed] [ref=f2e4] [cursor=pointer]'
+  - main [ref=f2e5]:
+    - generic [ref=f2e6]:
+      - img "Blip, idle" [ref=f2e8]
+      - heading "Voice Arcade" [level=1] [ref=f2e15]
+      - paragraph [ref=f2e16]: "Five short games, each played twice: once typing, once speaking with Wispr Flow. Then three days of tiny quests in your real work. It takes about a minute to get going."
+      - list [ref=f2e17]:
+        - listitem [ref=f2e18]:
+          - strong [ref=f2e19]: Play five games
+          - text: Type one round, speak the other. We compare them honestly.
+        - listitem [ref=f2e20]:
+          - strong [ref=f2e21]: Use Flow for three days
+          - text: One tiny quest a day, in the work you already do.
+        - listitem [ref=f2e22]:
+          - strong [ref=f2e23]: Check in on day 3
+          - text: Share your streak card and face one last boss round.
+      - button "Play" [ref=f2e24] [cursor=pointer]
+  - generic [ref=f2e25]:
+    - status [ref=f2e26]: A visitor! Quick, look busy. Hi, I'm Blip.
+    - img "Blip, your guide" [ref=f2e27]:
+      - img "Blip, cheering" [ref=f2e28]

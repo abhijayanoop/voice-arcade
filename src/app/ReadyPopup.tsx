@@ -104,7 +104,7 @@ export function ReadyPopup() {
   }
 
   return (
-    <main className="wa-page">
+    <main id="main" className="wa-page">
       <div className="wa-modal-scrim">
         <div
           ref={dialogRef}
