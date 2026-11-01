@@ -175,3 +175,30 @@ describe('jargonHits', () => {
     expect(jargonHits('', terms)).toEqual({ hits: [], total: 4 })
   })
 })
+
+describe('an implausibly fast round', () => {
+  // 10 words arriving at 1 s is 600 wpm: far beyond speech or typing, so the round is flagged but keeps its metrics.
+  const dictated = (t: number, words = 10): RoundLog => ({
+    mode: 'voice',
+    timerMs: 60000,
+    events: [{ t, kind: 'input', inputType: 'insertText', length: 50 }],
+    firstText: Array(words).fill('word').join(' '),
+    finalText: Array(words).fill('word').join(' '),
+  })
+
+  it('flags a voice round above 400 wpm', () => {
+    expect(capture(dictated(1500))).toMatchObject({ wpm: 400, integrity: 'ok' })
+    expect(capture(dictated(1000))).toMatchObject({ wpm: 600, integrity: 'flagged' })
+  })
+
+  it('flags a voice round whose text lands within a second of the start', () => {
+    expect(capture(dictated(900, 1))).toMatchObject({ wpm: 66.7, integrity: 'flagged' })
+    expect(capture(dictated(1000, 1))).toMatchObject({ integrity: 'ok' })
+  })
+
+  it('flags a typed round above 400 wpm', () => {
+    const events = [1000, 2000].flatMap((t) => [{ t, kind: 'key' as const }, { t, kind: 'input' as const, inputType: 'insertText', length: 1 }])
+    const text = Array(20).fill('a').join(' ')
+    expect(capture({ mode: 'typed', timerMs: 60000, events, firstText: text, finalText: text })).toMatchObject({ wpm: 600, integrity: 'flagged' })
+  })
+})

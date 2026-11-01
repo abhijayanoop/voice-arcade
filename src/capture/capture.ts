@@ -31,6 +31,11 @@ export interface CaptureMetrics {
 /** A voice round whose text came almost entirely from key presses is flagged; this is the share that counts as "almost entirely". */
 const KEYSTROKE_SHARE_FLAG = 0.8
 
+/** Faster than this is beyond speech or typing, so the round is flagged (kept, but left out of speed figures and the podium). */
+const MAX_PLAUSIBLE_WPM = 400
+/** A voice round whose text lands sooner than this after the start was not spoken. */
+const MIN_VOICE_ACTIVE_MS = 1000
+
 export function countWords(text: string): number {
   const trimmed = text.trim()
   return trimmed === '' ? 0 : trimmed.split(/\s+/).length
@@ -66,10 +71,12 @@ export function capture(log: RoundLog): CaptureMetrics {
   const activeMs = events.length === 0 ? 0 : Math.min(Math.max(...events.map((e) => e.t)), log.timerMs)
   const wpm = activeMs === 0 ? 0 : Math.round((words / (activeMs / 60000)) * 10) / 10
 
+  const tooFast = wpm > MAX_PLAUSIBLE_WPM
   const flagged =
-    mode === 'typed'
+    tooFast ||
+    (mode === 'typed'
       ? pasteEvents > 0 || insertEvents > 0
-      : chars > 0 && keystrokes >= KEYSTROKE_SHARE_FLAG * chars
+      : chars > 0 && (keystrokes >= KEYSTROKE_SHARE_FLAG * chars || activeMs < MIN_VOICE_ACTIVE_MS))
 
   return {
     words,

@@ -19,5 +19,6 @@ Not yet tested on real Flow; this needs a person with Flow on both systems. Unti
 
 - Typed rounds block paste and drops, so any paste or bulk insert that still arrives flags the round.
 - Voice rounds allow insertion. A voice round is flagged when key presses reach 80% of the characters.
+- Any round above 400 words per minute is flagged, and so is a voice round whose text lands within 1 second of the start: neither is speech or typing. Flagged rounds stay stored but are left out of speed figures and the Speed race.
 - Active time runs from the round start to the last input or the timer end, in both modes, so typed and voice compare on one clock.
 - A voice step the Player types instead is stored in the voice slot, flagged, with `typed_instead` in its answers, so the unique key (player, game, mode) holds.
