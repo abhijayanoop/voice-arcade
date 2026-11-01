@@ -43,7 +43,7 @@ One private bucket for streak cards. Object path starts with the player's token 
 
 ## Findings export
 
-A local script reads with the service key and writes `findings.json`. Contents are aggregates only:
+A local script (`npm run findings`, `scripts/export-findings.mjs`) reads with the service key from `.env` and writes `findings.json` (git-ignored). "Still using" = quest days 1-3 all done and the day-3 check-in lists an AI tool (`Cursor`, set in `scripts/lib/aggregate.mjs`). Contents are aggregates only:
 
 - Players: count, by cohort, by OS, arcade completion.
 - Per game and mode: round count, flagged count, mean and median words per minute, voice-to-typed ratio distribution, and which mode won per player.

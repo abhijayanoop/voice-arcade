@@ -4,11 +4,11 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The script reads from Supabase using the service key from a local environment file only
-- [ ] The output contains aggregates with counts for the games built so far and never individual Players' private data or dictated text
-- [ ] The "still using" headline is computed as defined in the spec
-- [ ] Day-5 follow-up data is marked as a labelled update
-- [ ] The output is a single static JSON snapshot the portfolio can consume
-- [ ] Rerunning the script after more games ship includes their counts
+- [x] The script reads from Supabase using the service key from a local environment file only
+- [x] The output contains aggregates with counts for the games built so far and never individual Players' private data or dictated text
+- [x] The "still using" headline is computed as defined in the spec
+- [x] Day-5 follow-up data is marked as a labelled update
+- [x] The output is a single static JSON snapshot the portfolio can consume
+- [x] Rerunning the script after more games ship includes their counts

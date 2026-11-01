@@ -9,6 +9,7 @@
     "build": "npm run tokens && tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "findings": "node --env-file=.env scripts/export-findings.mjs",
     "smoke": "node --env-file=.env scripts/smoke.mjs"
   },
   "dependencies": {

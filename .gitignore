@@ -4,3 +4,5 @@ dist
 .env.*
 src/styles/tokens.css
 !.env.example
+
+findings.json
