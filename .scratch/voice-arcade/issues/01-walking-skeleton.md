@@ -4,14 +4,14 @@
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] CSS variables are generated from the design tokens and the screens use the `wa-` classes
-- [ ] Welcome explains the experiment in about a minute
-- [ ] Code name entry offers suggestions and shows a clear error when the name is taken; the Player picks an avatar
-- [ ] The Player gives cohort, operating system and language mix once
-- [ ] The Ready popup has three freely switchable tabs, a tickable checklist and a try-it box
-- [ ] Consent can be given by saying or typing "I'm in", states what is shared and who sees it, and includes the Judges sentence; leaderboard opt-in is a separate choice
-- [ ] The Lobby shows done, next and locked games, and games unlock in order
-- [ ] Session tests cover unlock order and per-game mode-order randomisation bounds against the in-memory Api
-- [ ] A Player can click from Welcome to the Lobby end to end
+- [x] CSS variables are generated from the design tokens and the screens use the `wa-` classes
+- [x] Welcome explains the experiment in about a minute
+- [x] Code name entry offers suggestions and shows a clear error when the name is taken; the Player picks an avatar
+- [x] The Player gives cohort, operating system and language mix once
+- [x] The Ready popup has three freely switchable tabs, a tickable checklist and a try-it box
+- [x] Consent can be given by saying or typing "I'm in", states what is shared and who sees it, and includes the Judges sentence; leaderboard opt-in is a separate choice
+- [x] The Lobby shows done, next and locked games, and games unlock in order
+- [x] Session tests cover unlock order and per-game mode-order randomisation bounds against the in-memory Api
+- [x] A Player can click from Welcome to the Lobby end to end

@@ -4,13 +4,13 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The script table is parsed from the Blip scripts into data
-- [ ] `say(eventKey, vars)` returns the expression, move, target and line, substitutes variables and never repeats the last variant for that key
-- [ ] A seam-level test covers no immediate repeat and variable substitution
-- [ ] The bubble types out lines and Blip moves to elements marked as Blip targets
-- [ ] Quiet mode is on while any timer runs and off afterwards
-- [ ] The Player can drag Blip away and it stays out of the way
-- [ ] Blip reacts on Welcome, code name, Ready popup, Lobby and Brain dump blitz (where built)
-- [ ] Tickets that build screens later add their own event keys through the same `say()` call
+- [x] The script table is parsed from the Blip scripts into data
+- [x] `say(eventKey, vars)` returns the expression, move, target and line, substitutes variables and never repeats the last variant for that key
+- [x] A seam-level test covers no immediate repeat and variable substitution
+- [x] The bubble types out lines and Blip moves to elements marked as Blip targets
+- [x] Quiet mode is on while any timer runs and off afterwards
+- [x] The Player can drag Blip away and it stays out of the way
+- [x] Blip reacts on Welcome, code name, Ready popup, Lobby and Brain dump blitz (where built)
+- [x] Tickets that build screens later add their own event keys through the same `say()` call

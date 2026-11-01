@@ -4,11 +4,11 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The Player picks a language mix from chips before the round
-- [ ] Typed and voice rounds use different prompts, with randomised first mode and a type-it-instead option
-- [ ] Edit distance between the raw text and the final text is recorded
-- [ ] Sendable and Flow-accuracy ratings are recorded
-- [ ] Ratings, language mix and metrics are saved and no rant text is stored
-- [ ] The result screen and Blip events for the game are in place
+- [x] The Player picks a language mix from chips before the round
+- [x] Typed and voice rounds use different prompts, with randomised first mode and a type-it-instead option
+- [x] Edit distance between the raw text and the final text is recorded
+- [x] Sendable and Flow-accuracy ratings are recorded
+- [x] Ratings, language mix and metrics are saved and no rant text is stored
+- [x] The result screen and Blip events for the game are in place
