@@ -3,6 +3,7 @@ import {
   CodeNameTakenError,
   UnknownTokenError,
   type Api,
+  type BossSubmission,
   type DescriptionSubmission,
   type LeaderboardEntry,
   type Mode,
@@ -13,6 +14,25 @@ import {
 export type { Mode }
 export type Step = 'register' | 'consent' | 'lobby'
 export type GameStatus = 'done' | 'next' | 'locked'
+export type QuestStatus = 'done' | 'today' | 'missed' | 'locked'
+/** Where the Player is in the whole experiment: the arcade, then three days of quests, then the close. */
+export type Phase = 'arcade' | 'quests' | 'checkin' | 'boss' | 'thanks'
+
+const DAY_MS = 24 * 60 * 60 * 1000
+const QUEST_DAYS = [1, 2, 3] as const
+const CHECKIN_DAY = 3
+
+export interface CheckinInput {
+  streakDays: number
+  totalWords: number
+  apps: string[]
+  builtinTried: boolean
+  builtinReason: string
+  /** The Flow streak card. */
+  image?: Blob
+}
+
+export type BossInput = Omit<BossSubmission, 'payIf'> & { payIf: string }
 
 export interface GameView {
   key: GameKey
@@ -31,6 +51,14 @@ export interface SessionView {
   arcadeDone: boolean
   /** One wave per finished round. */
   waves: number
+  phase: Phase
+  /** The three daily quests; empty until the arcade is done. */
+  quests: { day: number; status: QuestStatus }[]
+  /** Consecutive quest days ticked, counted up to today (or yesterday while today is still open). */
+  streak: number
+  checkinDue: boolean
+  bossDue: boolean
+  totals: { waves: number; questsDone: number; streak: number }
 }
 
 export interface Session {
@@ -51,14 +79,21 @@ export interface Session {
   leaderboard(): Promise<LeaderboardEntry[]>
   /** Adds the post-game answers to a round already saved. */
   recordAnswers(game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
+  /** Ticks today's quest. Does nothing before the arcade is done. */
+  markQuest(): Promise<void>
+  /** Uploads the streak card, when given, and saves the day 3 check-in. */
+  submitCheckin(input: CheckinInput): Promise<void>
+  submitBoss(input: BossInput): Promise<void>
 }
 
 export function createSession({
   api,
   random = Math.random,
+  now = () => new Date(),
 }: {
   api: Api
   random?: () => number
+  now?: () => Date
 }): Session {
   const firstModes = new Map<GameKey, Mode>(
     GAMES.map(({ key }) => [key, random() < 0.5 ? 'typed' : 'voice']),
@@ -68,6 +103,10 @@ export function createSession({
   let player: SessionView['player'] = null
   let registerError: SessionView['registerError'] = null
   let arcadeDone = false
+  let arcadeDoneAt: number | null = null
+  let questDays = new Set<number>()
+  let checkinDone = false
+  let bossDone = false
   const completedModes = new Map<GameKey, Set<Mode>>()
   const isDone = (key: GameKey) => completedModes.get(key)?.size === 2
 
@@ -88,14 +127,70 @@ export function createSession({
     })
   }
 
+  /** Day 1 starts when the arcade finishes; each 24 hours after that opens the next day, up to day 3. */
+  function today(): number | null {
+    if (!arcadeDone) return null
+    const elapsed = arcadeDoneAt === null ? 0 : Math.max(0, now().getTime() - arcadeDoneAt)
+    return Math.min(QUEST_DAYS.length, Math.floor(elapsed / DAY_MS) + 1)
+  }
+
+  function quests(): SessionView['quests'] {
+    const current = today()
+    if (current === null) return []
+    return QUEST_DAYS.map((day) => ({
+      day,
+      status: questDays.has(day) ? 'done' : day === current ? 'today' : day < current ? 'missed' : 'locked',
+    }))
+  }
+
+  function streak(): number {
+    const current = today()
+    if (current === null) return 0
+    let day = questDays.has(current) ? current : current - 1
+    let run = 0
+    while (day >= 1 && questDays.has(day)) {
+      run++
+      day--
+    }
+    return run
+  }
+
+  const checkinDue = () => (today() ?? 0) >= CHECKIN_DAY && !checkinDone
+  const bossDue = () => arcadeDone && checkinDone && !bossDone
+
+  function phase(): Phase {
+    if (!arcadeDone) return 'arcade'
+    if (bossDone) return 'thanks'
+    if (checkinDone) return 'boss'
+    return checkinDue() ? 'checkin' : 'quests'
+  }
+
   async function finishIfDone(playerToken: string) {
     if (arcadeDone || !GAMES.every(({ key }) => isDone(key))) return
     await api.finishArcade(playerToken)
     arcadeDone = true
+    arcadeDoneAt = now().getTime()
   }
 
   return {
-    view: () => ({ step, player, registerError, games: games(), arcadeDone, waves: wavesEarned() }),
+    view: () => ({
+      step,
+      player,
+      registerError,
+      games: games(),
+      arcadeDone,
+      waves: wavesEarned(),
+      phase: phase(),
+      quests: quests(),
+      streak: streak(),
+      checkinDue: checkinDue(),
+      bossDue: bossDue(),
+      totals: {
+        waves: wavesEarned(),
+        questsDone: questDays.size,
+        streak: streak(),
+      },
+    }),
     token: () => token,
     async register(profile) {
       try {
@@ -129,6 +224,10 @@ export function createSession({
       step = state.player.consented ? 'lobby' : 'consent'
       registerError = null
       arcadeDone = state.player.arcadeDone
+      arcadeDoneAt = state.player.arcadeDoneAt ? Date.parse(state.player.arcadeDoneAt) : null
+      questDays = new Set(state.questDays)
+      checkinDone = state.checkinDays.includes(CHECKIN_DAY)
+      bossDone = state.bossDone
       completedModes.clear()
       for (const { game, mode, modeOrder } of state.rounds) {
         completedModes.set(game, (completedModes.get(game) ?? new Set()).add(mode))
@@ -150,6 +249,33 @@ export function createSession({
     async recordAnswers(game, mode, answers) {
       if (!token) throw new Error('register before playing')
       await api.recordAnswers(token, game, mode, answers)
+    },
+    async markQuest() {
+      const day = today()
+      if (!token || day === null) return
+      await api.markQuest(token, day)
+      questDays.add(day)
+    },
+    async submitCheckin({ streakDays, totalWords, apps, builtinTried, builtinReason, image }) {
+      if (!token || !arcadeDone) throw new Error('finish the arcade before the check-in')
+      const screenshotPath = image ? await api.uploadStreakCard(token, CHECKIN_DAY, image) : null
+      await api.submitCheckin(token, {
+        day: CHECKIN_DAY,
+        streakDays,
+        totalWords,
+        apps,
+        screenshotPath,
+        answers: {
+          tried_builtin: builtinTried,
+          builtin_dictation_reason: builtinTried ? builtinReason.trim() : '',
+        },
+      })
+      checkinDone = true
+    },
+    async submitBoss({ payIf, ...rest }) {
+      if (!token || !checkinDone) throw new Error('finish the check-in before the boss round')
+      await api.submitBoss(token, { ...rest, payIf: payIf.trim() || null })
+      bossDone = true
     },
   }
 }

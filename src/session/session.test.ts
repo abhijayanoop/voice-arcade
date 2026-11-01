@@ -384,3 +384,148 @@ describe('a failed finish', () => {
     expect(session.view().arcadeDone).toBe(true)
   })
 })
+
+describe('the three-day experiment', () => {
+  const HOUR = 3600_000
+  const DAY = 24 * HOUR
+  const ALL = ['brain_dump', 'decode', 'rant', 'juggler', 'snippet'] as const
+
+  async function finishedArcade() {
+    const clock = { ms: Date.parse('2026-11-01T10:00:00Z') }
+    const now = () => new Date(clock.ms)
+    const api = createMemoryApi({ now })
+    const session = createSession({ api, now })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+    for (const game of ALL) {
+      await session.completeRound(game, 'typed', metrics())
+      await session.completeRound(game, 'voice', metrics())
+    }
+    const reopen = async () => {
+      const back = createSession({ api, now })
+      await back.resume(session.token()!)
+      return back
+    }
+    return { api, session, clock, reopen }
+  }
+
+  it('has no quests, check-in or boss before the arcade is done', async () => {
+    const api = createMemoryApi()
+    const session = createSession({ api })
+    await session.register(profile())
+    await session.giveConsent({ leaderboardOptIn: false })
+
+    expect(session.view().phase).toBe('arcade')
+    expect(session.view().checkinDue).toBe(false)
+    expect(session.view().bossDue).toBe(false)
+    await session.markQuest()
+    expect(api.players()).toHaveLength(1)
+    expect((await api.getState(session.token()!)).questDays).toEqual([])
+  })
+
+  it('offers one quest a day and lets the Player tick today only, building a streak', async () => {
+    const { session, clock } = await finishedArcade()
+    expect(session.view().phase).toBe('quests')
+    expect(session.view().quests.map((q) => q.status)).toEqual(['today', 'locked', 'locked'])
+    expect(session.view().streak).toBe(0)
+
+    await session.markQuest()
+    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'locked', 'locked'])
+    expect(session.view().streak).toBe(1)
+
+    clock.ms += DAY
+    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'today', 'locked'])
+    await session.markQuest()
+    expect(session.view().streak).toBe(2)
+  })
+
+  it('shows a missed day and a broken streak', async () => {
+    const { session, clock } = await finishedArcade()
+    await session.markQuest()
+    clock.ms += 2 * DAY
+
+    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'missed', 'today'])
+    expect(session.view().streak).toBe(0)
+    await session.markQuest()
+    expect(session.view().streak).toBe(1)
+  })
+
+  it('keeps the quest ticks across a return through the personal link', async () => {
+    const { session, clock, reopen } = await finishedArcade()
+    await session.markQuest()
+    clock.ms += DAY
+
+    const back = await reopen()
+    expect(back.view().quests.map((q) => q.status)).toEqual(['done', 'today', 'locked'])
+    expect(back.view().streak).toBe(1)
+  })
+
+  it('makes the check-in due from day 3 and stores it with its image and apps', async () => {
+    const { api, session, clock } = await finishedArcade()
+    clock.ms += DAY
+    expect(session.view().checkinDue).toBe(false)
+    clock.ms += DAY
+    expect(session.view().checkinDue).toBe(true)
+    expect(session.view().phase).toBe('checkin')
+
+    await session.submitCheckin({
+      streakDays: 3,
+      totalWords: 4200,
+      apps: ['Slack', 'VS Code'],
+      builtinTried: true,
+      builtinReason: 'It stopped mid-sentence',
+      image: new Blob(['png'], { type: 'image/png' }),
+    })
+
+    expect(api.uploads()).toHaveLength(1)
+    expect(api.uploads()[0]).toContain(session.token()!)
+    expect(api.checkins()).toEqual([
+      {
+        day: 3,
+        streakDays: 3,
+        totalWords: 4200,
+        apps: ['Slack', 'VS Code'],
+        screenshotPath: api.uploads()[0],
+        answers: { tried_builtin: true, builtin_dictation_reason: 'It stopped mid-sentence' },
+      },
+    ])
+    expect(session.view().checkinDue).toBe(false)
+    expect(session.view().bossDue).toBe(true)
+    expect(session.view().phase).toBe('boss')
+  })
+
+  it('stores the boss round, then shows the totals on the thank-you', async () => {
+    const { api, session, clock, reopen } = await finishedArcade()
+    await session.markQuest()
+    clock.ms += 2 * DAY
+    await session.submitCheckin({ streakDays: 2, totalWords: 900, apps: [], builtinTried: false, builtinReason: '' })
+
+    await session.submitBoss({ annoyance: 5, disappointment: 'very', payIntent: 'maybe', payIf: 'Cheaper for students' })
+
+    expect(api.boss()).toEqual([
+      { annoyance: 5, disappointment: 'very', payIntent: 'maybe', payIf: 'Cheaper for students' },
+    ])
+    expect(session.view().bossDue).toBe(false)
+    expect(session.view().phase).toBe('thanks')
+    expect(session.view().totals).toEqual({ waves: 10, questsDone: 1, streak: 0 })
+
+    const back = await reopen()
+    expect(back.view().phase).toBe('thanks')
+  })
+
+  it('stores a blank "what would change your mind" as nothing', async () => {
+    const { api, session, clock } = await finishedArcade()
+    clock.ms += 2 * DAY
+    await session.submitCheckin({ streakDays: 1, totalWords: 1, apps: [], builtinTried: false, builtinReason: '' })
+    await session.submitBoss({ annoyance: 1, disappointment: 'not', payIntent: 'no', payIf: '   ' })
+
+    expect(api.boss()[0].payIf).toBeNull()
+  })
+
+  it('does not report a boss round due before the check-in', async () => {
+    const { session, clock } = await finishedArcade()
+    clock.ms += 5 * DAY
+    expect(session.view().bossDue).toBe(false)
+    expect(session.view().checkinDue).toBe(true)
+  })
+})

@@ -26,7 +26,7 @@ Implemented in `supabase/migrations/0001_voice_arcade.sql` and `0002_record_answ
 |---|---|
 | `register_player(code_name, avatar, cohort, os, languages)` | Creates the player; fails clearly if the code name is taken; returns the token |
 | `record_consent(token, leaderboard_opt_in)` | Sets `consented_at` and the opt-in |
-| `get_state(token)` | Returns the player, finished games and modes, quest days done, check-in and boss status |
+| `get_state(token)` | Returns the player (with `arcadeDoneAt`, from which the quest days count), finished games and modes, quest days done, check-in and boss status (migration `0004_arcade_done_at.sql`) |
 | `submit_round(token, round, description?)` | Inserts the round; idempotent on (player, game, mode); inserts the description when given |
 | `record_answers(token, game, mode, answers)` | Merges post-game answers into a saved round; metrics are untouched (migration `0002_record_answers.sql`) |
 | `finish_arcade(token)` | Sets `arcade_done_at` |

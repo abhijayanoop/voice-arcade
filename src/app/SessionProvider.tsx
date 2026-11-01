@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { createApi } from '../api'
 import type { DescriptionSubmission, LeaderboardEntry, PlayerProfile, RoundMetrics } from '../api/types'
 import type { GameKey } from '../games/registry'
-import { createSession, type Mode, type SessionView } from '../session/session'
+import { createSession, type BossInput, type CheckinInput, type Mode, type SessionView } from '../session/session'
 
 const TOKEN_KEY = 'voice-arcade.token'
 
@@ -17,6 +17,9 @@ interface SessionContextValue {
   completeRound(game: GameKey, mode: Mode, metrics: RoundMetrics, description?: DescriptionSubmission): Promise<void>
   recordAnswers(game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
   leaderboard(): Promise<LeaderboardEntry[]>
+  markQuest(): Promise<void>
+  submitCheckin(input: CheckinInput): Promise<void>
+  submitBoss(input: BossInput): Promise<void>
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null)
@@ -71,6 +74,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       },
       recordAnswers: (game, mode, answers) => session.recordAnswers(game, mode, answers),
       leaderboard: () => session.leaderboard(),
+      markQuest: async () => {
+        await session.markQuest()
+        refresh()
+      },
+      submitCheckin: async (input) => {
+        await session.submitCheckin(input)
+        refresh()
+      },
+      submitBoss: async (input) => {
+        await session.submitBoss(input)
+        refresh()
+      },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [session, view, restoring, token],

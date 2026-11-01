@@ -60,6 +60,7 @@ export function ArcadeDone() {
             </p>
           )}
           <div className="wa-actions">
+            <Link to="/quests" className="wa-btn wa-btn--primary">Go to my quest board</Link>
             <Link to="/lobby" className="wa-btn wa-btn--ghost">Back to lobby</Link>
           </div>
         </section>
