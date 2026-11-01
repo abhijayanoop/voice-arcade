@@ -4,14 +4,14 @@
 
 **Blocked by:** 02
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The quest board shows one quest per day and the Player can tick today's quest; the streak is visible
-- [ ] The check-in is due on day 3 and accepts a streak card image upload plus the card's numbers
-- [ ] The image goes to the private insert-only bucket and cannot be read by the browser
-- [ ] The check-in records the apps where Flow was used most and the built-in dictation question
-- [ ] The boss round runs thirty minutes without Flow
-- [ ] Annoyance, loss-feeling, willingness to pay and what would change their mind are recorded
-- [ ] The thank-you shows the Player's totals
-- [ ] Session view-state reports whether a check-in or boss round is due
-- [ ] A day-3 check-in lands with its image
+- [x] The quest board shows one quest per day and the Player can tick today's quest; the streak is visible
+- [x] The check-in is due on day 3 and accepts a streak card image upload plus the card's numbers
+- [x] The image goes to the private insert-only bucket and cannot be read by the browser
+- [x] The check-in records the apps where Flow was used most and the built-in dictation question
+- [x] The boss round runs thirty minutes without Flow
+- [x] Annoyance, loss-feeling, willingness to pay and what would change their mind are recorded
+- [x] The thank-you shows the Player's totals
+- [x] Session view-state reports whether a check-in or boss round is due
+- [x] A day-3 check-in lands with its image
