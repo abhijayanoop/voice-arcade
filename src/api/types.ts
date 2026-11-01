@@ -56,11 +56,33 @@ export interface LeaderboardEntry {
 }
 
 export interface PlayerState {
-  player: PlayerProfile & { consented: boolean; leaderboardOptIn: boolean; arcadeDone: boolean }
+  player: PlayerProfile & { consented: boolean; leaderboardOptIn: boolean; arcadeDone: boolean; arcadeDoneAt: string | null }
   rounds: { game: GameKey; mode: Mode; modeOrder: 1 | 2 }[]
   questDays: number[]
   checkinDays: number[]
   bossDone: boolean
+}
+
+/** The day 3 check-in (day 5 is a later follow-up). */
+export interface CheckinSubmission {
+  day: 3 | 5
+  streakDays: number
+  totalWords: number
+  /** Apps where Flow was used most. */
+  apps: string[]
+  /** Storage path of the streak card, when one was uploaded. */
+  screenshotPath: string | null
+  answers: Record<string, unknown>
+}
+
+export type Disappointment = 'very' | 'somewhat' | 'not'
+export type PayIntent = 'already' | 'yes' | 'maybe' | 'no'
+
+export interface BossSubmission {
+  annoyance: number
+  disappointment: Disappointment
+  payIntent: PayIntent
+  payIf: string | null
 }
 
 export class CodeNameTakenError extends Error {
@@ -93,4 +115,10 @@ export interface Api {
   getJudgeBatch(judgeKey: string, n: number): Promise<JudgeItem[]>
   /** One pick per (description, Judge); a repeat is ignored. */
   submitJudgment(judgeKey: string, descriptionId: string, pickedScene: string): Promise<void>
+  /** Records a quest day; a repeat is ignored. */
+  markQuest(token: string, day: number): Promise<void>
+  /** Insert-only: the browser can send a streak card but never read one back. Returns the stored path. */
+  uploadStreakCard(token: string, day: number, file: Blob): Promise<string>
+  submitCheckin(token: string, checkin: CheckinSubmission): Promise<void>
+  submitBoss(token: string, boss: BossSubmission): Promise<void>
 }

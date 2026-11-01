@@ -93,3 +93,11 @@ textarea.wa-input { resize: vertical; min-height: 96px; }
 ul.wa-chips { list-style: none; padding: 0; margin: 0; }
 li.wa-chip { cursor: default; }
 li.wa-chip.is-hit { background: var(--lavender); color: var(--lavender-ink); border-color: var(--lavender); }
+
+.wa-quests { list-style: none; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.wa-quest { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1.5px solid var(--cream-300); background: var(--paper); }
+.wa-quest__day { font: 600 15px/20px var(--font-sans); }
+.wa-quest__state { font: 500 14px/18px var(--font-sans); }
+.wa-quest.is-today { border-color: var(--lavender); }
+.wa-quest.is-done { background: var(--lavender); color: var(--lavender-ink); border-color: var(--lavender); }
+.wa-quest.is-locked, .wa-quest.is-missed { opacity: 0.7; }

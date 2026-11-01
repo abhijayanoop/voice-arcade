@@ -86,5 +86,42 @@ export function createSupabaseApi(url: string, publishableKey: string): Api {
     async submitJudgment(judgeKey, descriptionId, pickedScene) {
       await rpc('submit_judgment', { p_judge_key: judgeKey, p_description_id: descriptionId, p_picked_scene: pickedScene })
     },
+    async markQuest(token, day) {
+      await rpc('mark_quest', { p_token: token, p_day: day })
+    },
+    async uploadStreakCard(token, day, file) {
+      const ext = file.type === 'image/jpeg' ? 'jpg' : file.type === 'image/webp' ? 'webp' : 'png'
+      const path = `${token}/day${day}.${ext}`
+      const { error } = await client.storage.from('streak-cards').upload(path, file, { contentType: file.type })
+      // The bucket is insert-only, so a retry of an upload that already landed is a duplicate, not a failure.
+      if (error && !/duplicate|already exists/i.test(error.message)) {
+        throw new Error(`streak card upload failed: ${error.message}`)
+      }
+      return path
+    },
+    async submitCheckin(token, checkin) {
+      await rpc('submit_checkin', {
+        p_token: token,
+        p_day: checkin.day,
+        p_fields: {
+          streak_days: checkin.streakDays,
+          total_words: checkin.totalWords,
+          apps: checkin.apps,
+          screenshot_path: checkin.screenshotPath,
+          answers: checkin.answers,
+        },
+      })
+    },
+    async submitBoss(token, boss) {
+      await rpc('submit_boss', {
+        p_token: token,
+        p_fields: {
+          annoyance: boss.annoyance,
+          disappointment: boss.disappointment,
+          pay_intent: boss.payIntent,
+          pay_if: boss.payIf,
+        },
+      })
+    },
   }
 }

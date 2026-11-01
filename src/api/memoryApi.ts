@@ -8,6 +8,8 @@ import {
   type DescriptionSubmission,
   type JudgeItem,
   type LeaderboardEntry,
+  type CheckinSubmission,
+  type BossSubmission,
 } from './types'
 
 interface StoredPlayer extends PlayerProfile {
@@ -15,6 +17,7 @@ interface StoredPlayer extends PlayerProfile {
   consented: boolean
   leaderboardOptIn: boolean
   arcadeDone: boolean
+  arcadeDoneAt: string | null
 }
 
 export interface MemoryApi extends Api {
@@ -22,6 +25,9 @@ export interface MemoryApi extends Api {
   players(): StoredPlayer[]
   rounds(): RoundSubmission[]
   descriptions(): DescriptionSubmission[]
+  checkins(): CheckinSubmission[]
+  boss(): BossSubmission[]
+  uploads(): string[]
   judgments(): { descriptionId: string; judgeKey: string; pickedScene: string; correct: boolean }[]
 }
 
@@ -29,10 +35,14 @@ interface StoredDescription extends DescriptionSubmission {
   id: string
 }
 
-export function createMemoryApi(): MemoryApi {
+export function createMemoryApi({ now = () => new Date() }: { now?: () => Date } = {}): MemoryApi {
   const store = new Map<string, StoredPlayer>()
   const roundsByToken = new Map<string, RoundSubmission[]>()
   const descriptionList: StoredDescription[] = []
+  const questsByToken = new Map<string, Set<number>>()
+  const checkinsByToken = new Map<string, CheckinSubmission[]>()
+  const bossByToken = new Map<string, BossSubmission>()
+  const uploadList: string[] = []
   const judgmentList: ReturnType<MemoryApi['judgments']> = []
 
   const find = (token: string) => {
@@ -48,7 +58,7 @@ export function createMemoryApi(): MemoryApi {
       )
       if (taken) throw new CodeNameTakenError()
       const token = `mem-${store.size + 1}-${Math.random().toString(36).slice(2, 10)}`
-      store.set(token, { ...profile, token, consented: false, leaderboardOptIn: false, arcadeDone: false })
+      store.set(token, { ...profile, token, consented: false, leaderboardOptIn: false, arcadeDone: false, arcadeDoneAt: null })
       return { token }
     },
     async recordConsent(token, leaderboardOptIn) {
@@ -57,13 +67,13 @@ export function createMemoryApi(): MemoryApi {
       player.leaderboardOptIn = leaderboardOptIn
     },
     async getState(token): Promise<PlayerState> {
-      const { codeName, avatar, cohort, os, languages, consented, leaderboardOptIn, arcadeDone } = find(token)
+      const { codeName, avatar, cohort, os, languages, consented, leaderboardOptIn, arcadeDone, arcadeDoneAt } = find(token)
       return {
-        player: { codeName, avatar, cohort, os, languages: [...languages], consented, leaderboardOptIn, arcadeDone },
+        player: { codeName, avatar, cohort, os, languages: [...languages], consented, leaderboardOptIn, arcadeDone, arcadeDoneAt },
         rounds: (roundsByToken.get(token) ?? []).map(({ game, mode, modeOrder }) => ({ game, mode, modeOrder })),
-        questDays: [],
-        checkinDays: [],
-        bossDone: false,
+        questDays: [...(questsByToken.get(token) ?? [])].sort(),
+        checkinDays: (checkinsByToken.get(token) ?? []).map((c) => c.day).sort(),
+        bossDone: bossByToken.has(token),
       }
     },
     async submitRound(token, round, description) {
@@ -74,7 +84,10 @@ export function createMemoryApi(): MemoryApi {
       if (description) descriptionList.push({ ...description, id: `desc-${descriptionList.length + 1}` })
     },
     async finishArcade(token) {
-      find(token).arcadeDone = true
+      const player = find(token)
+      if (player.arcadeDone) return
+      player.arcadeDone = true
+      player.arcadeDoneAt = now().toISOString()
     },
     // Mirrors get_leaderboard: opted-in Players only, voice Brain dump rounds that were not flagged.
     async getLeaderboard() {
@@ -106,6 +119,28 @@ export function createMemoryApi(): MemoryApi {
       if (judgmentList.some((j) => j.descriptionId === descriptionId && j.judgeKey === judgeKey)) return
       judgmentList.push({ descriptionId, judgeKey, pickedScene, correct: pickedScene === description.targetScene })
     },
+    async markQuest(token, day) {
+      find(token)
+      questsByToken.set(token, (questsByToken.get(token) ?? new Set()).add(day))
+    },
+    async uploadStreakCard(token, day) {
+      find(token)
+      const path = `${token}/day${day}.png`
+      if (!uploadList.includes(path)) uploadList.push(path)
+      return path
+    },
+    async submitCheckin(token, checkin) {
+      find(token)
+      const others = (checkinsByToken.get(token) ?? []).filter((c) => c.day !== checkin.day)
+      checkinsByToken.set(token, [...others, checkin])
+    },
+    async submitBoss(token, boss) {
+      find(token)
+      bossByToken.set(token, boss)
+    },
+    checkins: () => [...checkinsByToken.values()].flat(),
+    boss: () => [...bossByToken.values()],
+    uploads: () => [...uploadList],
     players: () => [...store.values()].map((p) => ({ ...p })),
     rounds: () => [...roundsByToken.values()].flat(),
     descriptions: () => descriptionList.map(({ sceneSet, targetScene, text }) => ({ sceneSet, targetScene, text })),
