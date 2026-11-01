@@ -58,7 +58,7 @@ export interface SessionView {
   streak: number
   checkinDue: boolean
   bossDue: boolean
-  totals: { waves: number; rounds: number; questsDone: number; streak: number }
+  totals: { waves: number; questsDone: number; streak: number }
 }
 
 export interface Session {
@@ -187,7 +187,6 @@ export function createSession({
       bossDue: bossDue(),
       totals: {
         waves: wavesEarned(),
-        rounds: wavesEarned(),
         questsDone: questDays.size,
         streak: streak(),
       },

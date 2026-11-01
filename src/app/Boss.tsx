@@ -37,7 +37,6 @@ export function Boss() {
   const navigate = useNavigate()
   const [startedAt, setStartedAt] = useState<number | null>(readStart)
   const [now, setNow] = useState(Date.now())
-  const [skipped, setSkipped] = useState(false)
   const [annoyance, setAnnoyance] = useState<number | null>(null)
   const [loss, setLoss] = useState<Disappointment | null>(null)
   const [pay, setPay] = useState<PayIntent | null>(null)
@@ -52,7 +51,7 @@ export function Boss() {
   }, [startedAt])
 
   const remaining = startedAt === null ? BOSS_MS : BOSS_MS - (now - startedAt)
-  const questions = skipped || (startedAt !== null && remaining <= 0)
+  const questions = (startedAt !== null && remaining <= 0)
   const ready = annoyance !== null && loss !== null && pay !== null
 
   function start() {
@@ -101,10 +100,6 @@ export function Boss() {
             ) : (
               <p className="wa-gain" role="timer" aria-label="Time left without Flow">{clock(remaining)} left</p>
             )}
-            <p className="wa-note">
-              Already did your thirty minutes?{' '}
-              <button type="button" className="wa-btn wa-btn--ghost" onClick={() => setSkipped(true)}>Skip to the questions</button>
-            </p>
           </section>
         ) : (
           <form className="wa-card" onSubmit={submit}>

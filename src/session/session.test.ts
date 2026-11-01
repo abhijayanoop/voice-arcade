@@ -507,7 +507,7 @@ describe('the three-day experiment', () => {
     ])
     expect(session.view().bossDue).toBe(false)
     expect(session.view().phase).toBe('thanks')
-    expect(session.view().totals).toEqual({ waves: 10, rounds: 10, questsDone: 1, streak: 0 })
+    expect(session.view().totals).toEqual({ waves: 10, questsDone: 1, streak: 0 })
 
     const back = await reopen()
     expect(back.view().phase).toBe('thanks')

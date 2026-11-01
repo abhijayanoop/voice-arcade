@@ -11,7 +11,7 @@ export function Thanks() {
     say('farewell', { name })
   }, [say, name])
 
-  const { waves, rounds, questsDone, streak } = view.totals
+  const { waves, questsDone, streak } = view.totals
   return (
     <main className="wa-page">
       <div className="wa-screen">
@@ -20,7 +20,6 @@ export function Thanks() {
           <h2 className="wa-heading">Your totals</h2>
           <ul className="wa-body">
             <li><strong>{waves}</strong> waves earned</li>
-            <li><strong>{rounds}</strong> arcade rounds played</li>
             <li><strong>{questsDone}</strong> of 3 quests ticked</li>
             <li><strong>{streak}</strong>-day quest streak</li>
           </ul>
