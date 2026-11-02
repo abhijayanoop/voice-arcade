@@ -34,6 +34,14 @@ export function CheckIn() {
     apps.length > 0 &&
     tried !== null
 
+  const missing =
+    image === null ? 'Add your streak card'
+    : streakDays === '' || !Number.isInteger(days) || days < 0 ? 'Enter the streak days on the card'
+    : totalWords === '' || !Number.isInteger(words) || words < 0 ? 'Enter your total words'
+    : apps.length === 0 ? 'Pick at least one app'
+    : tried === null ? 'Say whether you tried the built-in dictation'
+    : null
+
   function pickImage(file: File | undefined) {
     setImageError(null)
     if (!file) return setImage(null)
@@ -155,6 +163,7 @@ export function CheckIn() {
         </div>
 
         {failed && <p className="wa-error" role="alert">That did not save. Check your connection and try again.</p>}
+        {missing && <p className="wa-note" role="status">To send: {missing.charAt(0).toLowerCase() + missing.slice(1)}.</p>}
         <div className="wa-actions">
           <button type="submit" className="wa-btn wa-btn--primary" disabled={!ready || busy}>
             Send my check-in

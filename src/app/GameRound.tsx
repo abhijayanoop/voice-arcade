@@ -79,6 +79,12 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
   const isJuggler = gameKey === 'juggler'
   const score = useRef<JugglerScore>({ caught: 0, dropped: 0 })
   const { langMix, setLangMix } = run
+  /** Why the main button is disabled, when it is. */
+  const submitHint =
+    phase === 'ready' && isRant && !langMix ? 'Pick your language mix above to start.'
+    : phase === 'edit' && sendable === null ? 'Rate how sendable your version is to submit.'
+    : phase === 'edit' && mode === 'voice' && !typedInstead && accuracy === null ? 'Rate how accurate Flow was to submit.'
+    : null
   const { say } = useBlip()
   useBlipOnMount(mode === 'typed' ? 'round.typed_intro' : 'round.voice_intro')
   // Quiet mode: Blip docks and stays silent for as long as the clock runs.
@@ -259,6 +265,7 @@ function Round({ gameKey, mode, secondRound }: { gameKey: GameKey; mode: Mode; s
           data-blip-target="answer-input"
         />
         {notice && <p className="wa-error" role="status">{notice}</p>}
+        {submitHint && <p className="wa-note" role="status">{submitHint}</p>}
         <div className="wa-actions">
           {phase === 'ready' ? (
             <button type="button" className="wa-btn wa-btn--primary" disabled={isRant && !langMix} onClick={start} data-blip-target="start">
