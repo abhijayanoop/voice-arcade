@@ -3,6 +3,7 @@
 // (git-ignored), and `npm run findings` leaves them out unless you pass --include-simulated.
 //
 //   npm run seed-sim                 create the simulated players (refuses if a manifest already exists)
+//   npm run seed-sim -- --extend     add boss-round answers and Judge ratings for the players in the manifest
 //   npm run seed-sim -- --remove     delete them, their streak-card images and the manifest
 //
 // Needs the service key in .env (local only). Runs through vite-node so it can reuse the scene generator.
@@ -42,8 +43,9 @@ if (process.argv.includes('--remove')) {
   process.exit(0)
 }
 
-if (existsSync(MANIFEST)) {
-  console.error('A manifest already exists. Run with --remove first.')
+const EXTEND = process.argv.includes('--extend')
+if (existsSync(MANIFEST) && !EXTEND) {
+  console.error('A manifest already exists. Run with --remove first (or --extend to add boss answers and Judge ratings).')
   process.exit(1)
 }
 
@@ -204,6 +206,71 @@ const rpc = async (fn, args) => {
   const { data, error } = await client.rpc(fn, args)
   if (error) throw new Error(`${fn}: ${error.message}`)
   return data
+}
+
+// ---------------------------------------------------------------- Extend: boss answers and Judge ratings for the existing simulated players
+if (EXTEND) {
+  if (!existsSync(MANIFEST)) {
+    console.error('No manifest: run npm run seed-sim first.')
+    process.exit(1)
+  }
+  const ids = JSON.parse(readFileSync(MANIFEST, 'utf8')).players.map((p) => p.id)
+  const { data: players } = await client.from('player').select('id, token, code_name').in('id', ids)
+  const { data: rounds } = await client.from('round').select('id, player_id, mode, wpm').in('player_id', ids)
+
+  // Boss round: how much they would miss Flow follows how much faster voice was for them.
+  const PAY_IF = [
+    'If it was cheaper for students',
+    'A free tier with a higher word limit',
+    'If it handled technical words better',
+    'If my employer paid for it',
+    'If it worked offline',
+  ]
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n))
+  for (const player of players) {
+    const mine = rounds.filter((r) => r.player_id === player.id)
+    const avg = (mode) => {
+      const list = mine.filter((r) => r.mode === mode)
+      return list.reduce((sum, r) => sum + Number(r.wpm), 0) / Math.max(1, list.length)
+    }
+    const ratio = avg('voice') / Math.max(1, avg('typed'))
+    const annoyance = clamp(Math.round(1.2 + (ratio - 1.5) * 1.1 + between(-0.8, 0.8)), 2, 5)
+    const disappointment = annoyance >= 5 || (annoyance === 4 && chance(0.5)) ? 'very' : annoyance >= 3 ? 'somewhat' : 'not'
+    const payIntent = disappointment === 'very' ? pick(['yes', 'yes', 'maybe', 'already']) : disappointment === 'somewhat' ? pick(['maybe', 'maybe', 'no']) : 'no'
+    await rpc('submit_boss', {
+      p_token: player.token,
+      p_fields: {
+        annoyance,
+        disappointment,
+        pay_intent: payIntent,
+        pay_if: payIntent === 'maybe' || payIntent === 'no' ? (chance(0.8) ? pick(PAY_IF) : null) : null,
+      },
+    })
+    console.log(`boss ${player.code_name}: annoyance ${annoyance}, ${disappointment}, pay ${payIntent}`)
+  }
+
+  // Judge ratings: only the simulated players' own descriptions, by seven simulated outside Judges.
+  // A Judge is more likely to pick the right scene when the description names the details that set it apart.
+  const roundIds = new Set(rounds.map((r) => r.id))
+  const { data: all } = await client.from('description').select('id, round_id, scene_set, target_scene, text')
+  const descriptions = all.filter((d) => roundIds.has(d.round_id))
+  const judges = Array.from({ length: 7 }, (_, i) => `simulated-judge-${i + 1}`)
+  let count = 0
+  for (const d of descriptions) {
+    const set = generateSceneSet(Number(d.scene_set.slice(1)))
+    const target = set.scenes.find((s) => s.id === d.target_scene)
+    const named = distinguishingDetails(set, target.id).filter((detail) => d.text.toLowerCase().includes(detail.label.toLowerCase())).length
+    const chanceRight = clamp(0.28 + named * 0.17, 0.28, 0.92)
+    const panel = [...judges].sort(() => rand() - 0.5).slice(0, int(3, 5))
+    for (const judge of panel) {
+      const wrong = set.scenes.filter((s) => s.id !== target.id)
+      const picked = chance(chanceRight) ? target.id : pick(wrong).id
+      await rpc('submit_judgment', { p_judge_key: judge, p_description_id: d.id, p_picked_scene: picked })
+      count++
+    }
+  }
+  console.log(`Rated ${descriptions.length} simulated descriptions with ${count} judgments.`)
+  process.exit(0)
 }
 
 const manifest = { createdAt: new Date().toISOString(), note: 'SIMULATED players. Not real survey data.', players: [] }
