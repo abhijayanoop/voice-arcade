@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "findings": "node --env-file=.env scripts/export-findings.mjs",
-    "smoke": "node --env-file=.env scripts/smoke.mjs"
+    "smoke": "node --env-file=.env scripts/smoke.mjs",
+    "seed-sim": "node --env-file=.env node_modules/vite-node/vite-node.mjs scripts/seed-simulated.mjs --"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

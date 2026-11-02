@@ -7,3 +7,4 @@ src/styles/tokens.css
 
 findings.json
 .playwright-mcp/
+scripts/.simulated-players.json
