@@ -77,7 +77,7 @@ export function CheckIn() {
   return (
     <main id="main" tabIndex={-1} className="wa-page">
       <form className="wa-screen" onSubmit={submit}>
-        <h1 className="wa-title">Day 3 check-in</h1>
+        <h1 className="wa-title">Day 2 check-in</h1>
         <div className="wa-card">
           <div className="wa-field" data-blip-target="upload">
             <label className="wa-label" htmlFor="streak-card">Your Flow streak card</label>

@@ -1,7 +1,8 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { RoundMetrics } from '../api/types'
 import type { GameKey } from '../games/registry'
 import type { Mode } from '../session/session'
+import { useSession } from './SessionProvider'
 
 /** A finished round kept in the browser for the Result screen to compare; the session has already saved it. */
 export interface PlayedRound {
@@ -24,8 +25,44 @@ interface GameRunValue {
 
 const GameRunContext = createContext<GameRunValue | null>(null)
 
+type Rounds = Partial<Record<GameKey, Partial<Record<Mode, PlayedRound>>>>
+
+/** Metrics only (never dictated text), kept per Player so a reload or a return by personal link still reaches the Result screen. */
+const storeKey = (who: string) => `voice-arcade.run:${who}`
+
+function readRounds(who: string): Rounds {
+  try {
+    return JSON.parse(window.localStorage.getItem(storeKey(who)) ?? '{}') as Rounds
+  } catch {
+    return {}
+  }
+}
+
 export function GameRunProvider({ children }: { children: React.ReactNode }) {
-  const [rounds, setRounds] = useState<Partial<Record<GameKey, Partial<Record<Mode, PlayedRound>>>>>({})
+  const { personalLink } = useSession()
+  const [rounds, setRounds] = useState<Rounds>({})
+  const [loadedFor, setLoadedFor] = useState<string | null>(null)
+
+  // When a Player is registered or restored, bring back the rounds saved in this browser.
+  useEffect(() => {
+    if (!personalLink) return
+    const stored = readRounds(personalLink)
+    setRounds((current) => {
+      const merged: Rounds = { ...stored }
+      for (const game of Object.keys(current) as GameKey[]) merged[game] = { ...stored[game], ...current[game] }
+      return merged
+    })
+    setLoadedFor(personalLink)
+  }, [personalLink])
+
+  useEffect(() => {
+    if (!personalLink || loadedFor !== personalLink) return
+    try {
+      window.localStorage.setItem(storeKey(personalLink), JSON.stringify(rounds))
+    } catch {
+      // Private mode: the run lasts for this visit only.
+    }
+  }, [rounds, personalLink, loadedFor])
   const [langMix, setLangMix] = useState<string | null>(null)
   const value = useMemo<GameRunValue>(
     () => ({

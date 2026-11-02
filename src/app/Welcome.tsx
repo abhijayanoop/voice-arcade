@@ -11,7 +11,7 @@ export function Welcome() {
         <BlipHero />
         <h1 className="wa-title">Voice Arcade</h1>
         <p className="wa-body">
-          Five short games, each played twice: once typing, once speaking with Wispr Flow. Then three
+          Five short games, each played twice: once typing, once speaking with Wispr Flow. Then two
           days of tiny quests in your real work. It takes about a minute to get going.
         </p>
         <ol className="wa-steps">
@@ -20,11 +20,11 @@ export function Welcome() {
             Type one round, speak the other. We compare them honestly.
           </li>
           <li>
-            <strong>Use Flow for three days</strong>
+            <strong>Use Flow for two days</strong>
             One tiny quest a day, in the work you already do.
           </li>
           <li>
-            <strong>Check in on day 3</strong>
+            <strong>Check in on day 2</strong>
             Share your streak card and face one last boss round.
           </li>
         </ol>

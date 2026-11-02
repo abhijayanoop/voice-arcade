@@ -91,7 +91,7 @@ export function Lobby() {
 
         {personalLink && (
           <p className="wa-body">
-            Your personal link brings you back here on day 2 and 3. Keep it safe.{' '}
+            Your personal link brings you back here on day 2. Keep it safe.{' '}
             <button
               type="button"
               className="wa-btn"

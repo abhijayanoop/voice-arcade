@@ -63,7 +63,7 @@ export interface PlayerState {
   bossDone: boolean
 }
 
-/** The day 3 check-in (day 5 is a later follow-up). */
+/** The final check-in, stored as day 3 (day 5 is a later follow-up); it opens on quest day 2. */
 export interface CheckinSubmission {
   day: 3 | 5
   streakDays: number

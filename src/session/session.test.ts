@@ -385,7 +385,7 @@ describe('a failed finish', () => {
   })
 })
 
-describe('the three-day experiment', () => {
+describe('the two-day experiment', () => {
   const HOUR = 3600_000
   const DAY = 24 * HOUR
   const ALL = ['brain_dump', 'decode', 'rant', 'juggler', 'snippet'] as const
@@ -426,25 +426,24 @@ describe('the three-day experiment', () => {
   it('offers one quest a day and lets the Player tick today only, building a streak', async () => {
     const { session, clock } = await finishedArcade()
     expect(session.view().phase).toBe('quests')
-    expect(session.view().quests.map((q) => q.status)).toEqual(['today', 'locked', 'locked'])
+    expect(session.view().quests.map((q) => q.status)).toEqual(['today', 'locked'])
     expect(session.view().streak).toBe(0)
 
     await session.markQuest()
-    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'locked', 'locked'])
+    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'locked'])
     expect(session.view().streak).toBe(1)
 
     clock.ms += DAY
-    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'today', 'locked'])
+    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'today'])
     await session.markQuest()
     expect(session.view().streak).toBe(2)
   })
 
   it('shows a missed day and a broken streak', async () => {
     const { session, clock } = await finishedArcade()
-    await session.markQuest()
-    clock.ms += 2 * DAY
+    clock.ms += DAY
 
-    expect(session.view().quests.map((q) => q.status)).toEqual(['done', 'missed', 'today'])
+    expect(session.view().quests.map((q) => q.status)).toEqual(['missed', 'today'])
     expect(session.view().streak).toBe(0)
     await session.markQuest()
     expect(session.view().streak).toBe(1)
@@ -456,20 +455,19 @@ describe('the three-day experiment', () => {
     clock.ms += DAY
 
     const back = await reopen()
-    expect(back.view().quests.map((q) => q.status)).toEqual(['done', 'today', 'locked'])
+    expect(back.view().quests.map((q) => q.status)).toEqual(['done', 'today'])
     expect(back.view().streak).toBe(1)
   })
 
-  it('makes the check-in due from day 3 and stores it with its image and apps', async () => {
+  it('makes the check-in due from day 2 and stores it with its image and apps', async () => {
     const { api, session, clock } = await finishedArcade()
-    clock.ms += DAY
     expect(session.view().checkinDue).toBe(false)
     clock.ms += DAY
     expect(session.view().checkinDue).toBe(true)
     expect(session.view().phase).toBe('checkin')
 
     await session.submitCheckin({
-      streakDays: 3,
+      streakDays: 2,
       totalWords: 4200,
       apps: ['Slack', 'VS Code'],
       builtinTried: true,
@@ -482,7 +480,7 @@ describe('the three-day experiment', () => {
     expect(api.checkins()).toEqual([
       {
         day: 3,
-        streakDays: 3,
+        streakDays: 2,
         totalWords: 4200,
         apps: ['Slack', 'VS Code'],
         screenshotPath: api.uploads()[0],
@@ -507,7 +505,7 @@ describe('the three-day experiment', () => {
     ])
     expect(session.view().bossDue).toBe(false)
     expect(session.view().phase).toBe('thanks')
-    expect(session.view().totals).toEqual({ waves: 10, questsDone: 1, streak: 0 })
+    expect(session.view().totals).toEqual({ waves: 10, questsDone: 1, streak: 1 })
 
     const back = await reopen()
     expect(back.view().phase).toBe('thanks')

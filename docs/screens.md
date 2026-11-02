@@ -9,7 +9,7 @@ Welcome ─▶ Code name + avatar ─▶ Ready popup (3 tabs, say "I'm in") ─�
    Lobby ─▶ for each game, unlocked in order:
               Game intro ─▶ Round A ─▶ Round B ─▶ Result       (A and B are typed and voice, order randomised per player)
    After game 5 ─▶ Arcade complete ─▶ Quest board (days 1–3)
-   Day 2–3 return via the personal link ─▶ Quest board ─▶ Check-in (day 3) ─▶ Boss round ─▶ Thanks
+   Day 2 return via the personal link ─▶ Quest board ─▶ Check-in (day 2) ─▶ Boss round ─▶ Thanks
 
 Outside Judge: shared link ─▶ Judge page ─▶ picks ─▶ done
 ```
@@ -27,7 +27,7 @@ Outside Judge: shared link ─▶ Judge page ─▶ picks ─▶ done
 | `/game/:key/result` | 8 · Round result and per-game frames | Typed versus voice, two quick questions | `get_state` | `record_answers` (the two quick questions) |
 | `/done` | 9 · Arcade complete | Summary, podium, next step | `get_state`, `get_leaderboard` | `finish_arcade` |
 | `/quests` | 10 · Quest board | Day 1–3 quests, streak | `get_state` | `mark_quest` |
-| `/check-in` | 11 · Day 3 check-in | Upload streak card, enter streak days, total words, apps, built-in dictation answer | `get_state` | `submit_checkin`, storage upload |
+| `/check-in` | 11 · Day 2 check-in | Upload streak card, enter streak days, total words, apps, built-in dictation answer | `get_state` | `submit_checkin`, storage upload |
 | `/boss` | 12 · Final boss and paying question | 30 minutes without Flow, annoyance, loss test, pay intent | `get_state` | `submit_boss` |
 | `/thanks` | 13 · Thanks | Close | `get_state` | none |
 | `/judge` | Outside judge page | Pick scenes for descriptions | `get_judge_batch` | `submit_judgment` |

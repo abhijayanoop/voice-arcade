@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useBlip } from './BlipProvider'
 import type { Expression } from './blip'
 
@@ -40,6 +41,7 @@ function perchPoint(rect: DOMRect): Point {
 /** Blip: renders the current scene, flies to targets, types the bubble and can be dragged away. */
 export function BlipHost() {
   const { scene, quiet, say } = useBlip()
+  const { pathname } = useLocation()
   const [place, setPlace] = useState<Point | null>(null)
   const [dragged, setDragged] = useState<Point | null>(null)
   const [dragging, setDragging] = useState(false)
@@ -62,6 +64,12 @@ export function BlipHost() {
     else setDragged(null)
     locate()
   }, [scene.id, locate])
+
+  // A new page has new targets (or none): find them once it has painted, so Blip never keeps a stale perch.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(locate)
+    return () => window.cancelAnimationFrame(frame)
+  }, [pathname, locate])
 
   useEffect(() => {
     window.addEventListener('resize', locate)

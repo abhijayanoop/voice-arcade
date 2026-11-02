@@ -2,7 +2,7 @@
 
 ## Question
 
-What turns "I like Flow" into "I need Flow"? The arcade shows where voice beats typing and where it does not; the three days test whether a player keeps using it; the boss round measures whether they would miss it.
+What turns "I like Flow" into "I need Flow"? The arcade shows where voice beats typing and where it does not; the two days test whether a player keeps using it; the boss round measures whether they would miss it.
 
 ## Headline outcome
 

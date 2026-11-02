@@ -28,7 +28,7 @@ function Guard({ step, children }: { step: keyof typeof ROUTE_FOR_STEP; children
   return <>{children}</>
 }
 
-/** The three-day screens: reachable once the arcade is done, and only while their phase is current. */
+/** The two-day screens: reachable once the arcade is done, and only while their phase is current. */
 function PhaseGuard({ phases, children }: { phases: (keyof typeof ROUTE_FOR_PHASE)[]; children: React.ReactNode }) {
   const { view, restoring } = useSession()
   if (restoring) return null

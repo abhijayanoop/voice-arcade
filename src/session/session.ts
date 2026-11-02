@@ -15,11 +15,14 @@ export type { Mode }
 export type Step = 'register' | 'consent' | 'lobby'
 export type GameStatus = 'done' | 'next' | 'locked'
 export type QuestStatus = 'done' | 'today' | 'missed' | 'locked'
-/** Where the Player is in the whole experiment: the arcade, then three days of quests, then the close. */
+/** Where the Player is in the whole experiment: the arcade, then two days of quests, then the close. */
 export type Phase = 'arcade' | 'quests' | 'checkin' | 'boss' | 'thanks'
 
 const DAY_MS = 24 * 60 * 60 * 1000
-const QUEST_DAYS = [1, 2, 3] as const
+const QUEST_DAYS = [1, 2] as const
+/** The check-in opens on this quest day. */
+const CHECKIN_OPENS_DAY = 2
+/** The key the final check-in is stored under; the database accepts day 3 or 5, so it keeps the original key. */
 const CHECKIN_DAY = 3
 
 export interface CheckinInput {
@@ -52,7 +55,7 @@ export interface SessionView {
   /** One wave per finished round. */
   waves: number
   phase: Phase
-  /** The three daily quests; empty until the arcade is done. */
+  /** The daily quests; empty until the arcade is done. */
   quests: { day: number; status: QuestStatus }[]
   /** Consecutive quest days ticked, counted up to today (or yesterday while today is still open). */
   streak: number
@@ -81,7 +84,7 @@ export interface Session {
   recordAnswers(game: GameKey, mode: Mode, answers: Record<string, unknown>): Promise<void>
   /** Ticks today's quest. Does nothing before the arcade is done. */
   markQuest(): Promise<void>
-  /** Uploads the streak card, when given, and saves the day 3 check-in. */
+  /** Uploads the streak card, when given, and saves the final check-in. */
   submitCheckin(input: CheckinInput): Promise<void>
   submitBoss(input: BossInput): Promise<void>
 }
@@ -127,7 +130,7 @@ export function createSession({
     })
   }
 
-  /** Day 1 starts when the arcade finishes; each 24 hours after that opens the next day, up to day 3. */
+  /** Day 1 starts when the arcade finishes; each 24 hours after that opens the next day, up to the last quest day. */
   function today(): number | null {
     if (!arcadeDone) return null
     const elapsed = arcadeDoneAt === null ? 0 : Math.max(0, now().getTime() - arcadeDoneAt)
@@ -155,7 +158,7 @@ export function createSession({
     return run
   }
 
-  const checkinDue = () => (today() ?? 0) >= CHECKIN_DAY && !checkinDone
+  const checkinDue = () => (today() ?? 0) >= CHECKIN_OPENS_DAY && !checkinDone
   const bossDue = () => arcadeDone && checkinDone && !bossDone
 
   function phase(): Phase {
