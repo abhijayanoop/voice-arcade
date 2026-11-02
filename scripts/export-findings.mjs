@@ -51,7 +51,7 @@ const findings = buildFindings({
   judgments: (await all('judgment', 'description_id, judge_key, correct')).filter((j) => descriptionIds.has(j.description_id)),
   quests: real(await all('quest', 'player_id, day')),
   checkins: real(await all('checkin', 'player_id, day, streak_days, total_words, apps')),
-  boss: await all('boss', 'annoyance, disappointment, pay_intent, pay_if'),
+  boss: real(await all('boss', 'player_id, annoyance, disappointment, pay_intent, pay_if')).map(({ player_id, ...answers }) => answers),
 })
 findings.simulatedPlayersExcluded = simulated.size
 
