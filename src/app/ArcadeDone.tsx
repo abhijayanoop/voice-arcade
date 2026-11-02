@@ -45,11 +45,11 @@ export function ArcadeDone() {
         <section className="wa-card" aria-label="What comes next">
           <h2 className="wa-heading">What comes next</h2>
           <p className="wa-body">
-            Now the real game: use Flow for the next three days. Your quest board holds one tiny quest a day. Come back through your personal link.
+            Now the real game: use Flow for the next two days. Your quest board holds one tiny quest a day. Come back through your personal link.
           </p>
           {personalLink && (
             <p className="wa-body">
-              <code>{personalLink}</code>{' '}
+              <code className="wa-link-code">{personalLink}</code>{' '}
               <button
                 type="button"
                 className="wa-btn"

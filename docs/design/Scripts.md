@@ -60,7 +60,7 @@ Every event Blip reacts to, with its expression, move, target and line variants.
 
 | Event key | Face | Move → target | Lines |
 | --- | --- | --- | --- |
-| `session.all_done` | cheering | celebrate → dock | "That's the full arcade. You legend." · "Done! Now the real game: use Flow for 3 days." |
+| `session.all_done` | cheering | celebrate → dock | "That's the full arcade. You legend." · "Done! Now the real game: use Flow for 2 days." |
 | `quest.intro` | pointing | travel across → `quest-board` | "One tiny quest a day. Do it in real life, not here." · "Your first quest: dictate every prompt today." |
 | `quest.return` | love | fly in → dock | "{name}! You came back. I wasn't worried. Okay, I was." · "Welcome back. How are the fingers feeling?" |
 | `quest.missed_day` | sad | hop | "You missed yesterday. I counted every second." · "No guilt. Okay, a little guilt. Today's quest is ready." |

@@ -121,18 +121,18 @@ function snippetBlock(rounds) {
   return out
 }
 
-/** "Still using": quest days 1-3 all done, and the day-3 check-in lists an AI tool among its apps. */
+/** "Still using": both quest days done, and the final (stored as day 3) check-in lists an AI tool among its apps. */
 export function stillUsing(players, quests, checkins) {
   const daysBy = new Map()
   for (const q of quests) daysBy.set(q.player_id, (daysBy.get(q.player_id) ?? new Set()).add(q.day))
-  const allThree = (id) => [1, 2, 3].every((d) => daysBy.get(id)?.has(d))
+  const doneBoth = (id) => [1, 2].every((d) => daysBy.get(id)?.has(d))
   const day3 = new Map(checkins.filter((c) => c.day === 3).map((c) => [c.player_id, c]))
-  const meets = players.filter((p) => allThree(p.id) && day3.get(p.id)?.apps.some((a) => AI_APPS.includes(a)))
+  const meets = players.filter((p) => doneBoth(p.id) && day3.get(p.id)?.apps.some((a) => AI_APPS.includes(a)))
   return {
-    definition: `Quest days 1, 2 and 3 all done, and the day-3 check-in lists an AI tool (${AI_APPS.join(', ')}) among its apps.`,
+    definition: `Quest days 1 and 2 both done, and the final check-in (stored as day 3) lists an AI tool (${AI_APPS.join(', ')}) among its apps.`,
     stillUsing: meets.length,
     outOf: players.length,
-    allThreeQuestDays: players.filter((p) => allThree(p.id)).length,
+    allQuestDays: players.filter((p) => doneBoth(p.id)).length,
     checkedInDay3: day3.size,
   }
 }

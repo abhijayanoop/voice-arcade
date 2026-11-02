@@ -1,6 +1,6 @@
 # Voice Arcade
 
-A survey website that works as a research instrument: friends play five typed-vs-voice games guided by a scripted agent called Blip, then use Wispr Flow for three days. The findings feed Abhijay's portfolio for the Wispr Flow growth challenge (submissions close 4 November 2026).
+A survey website that works as a research instrument: friends play five typed-vs-voice games guided by a scripted agent called Blip, then use Wispr Flow for two days. The findings feed Abhijay's portfolio for the Wispr Flow growth challenge (submissions close 4 November 2026).
 
 Read `CONTEXT.md` before naming anything. Read the ADRs in `docs/adr/` before touching architecture.
 

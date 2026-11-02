@@ -14,7 +14,7 @@ Postgres on Supabase. Every table has row-level security enabled and no policy f
 
 **quest**: pk (`player_id`, `day` 1..3), `done_at`.
 
-**checkin**: pk (`player_id`, `day` 3 or 5), `streak_days` int, `total_words` int, `apps` text[], `screenshot_path` text, `answers` jsonb (builtin_dictation_reason, where_used), `submitted_at`.
+**checkin**: pk (`player_id`, `day` 3 or 5; day 3 is the final check-in, which opens on quest day 2), `streak_days` int, `total_words` int, `apps` text[], `screenshot_path` text, `answers` jsonb (builtin_dictation_reason, where_used), `submitted_at`.
 
 **boss**: pk `player_id`, `annoyance` int 1..5, `disappointment` text (`very` | `somewhat` | `not`), `pay_intent` text (`already` | `yes` | `maybe` | `no`), `pay_if` text, `submitted_at`.
 
@@ -43,14 +43,14 @@ One private bucket for streak cards. Object path starts with the player's token 
 
 ## Findings export
 
-A local script (`npm run findings`, `scripts/export-findings.mjs`) reads with the service key from `.env` and writes `findings.json` (git-ignored). "Still using" = quest days 1-3 all done and the day-3 check-in lists an AI tool (`Cursor`, set in `scripts/lib/aggregate.mjs`). Contents are aggregates only:
+A local script (`npm run findings`, `scripts/export-findings.mjs`) reads with the service key from `.env` and writes `findings.json` (git-ignored). "Still using" = both quest days (1 and 2) done and the final check-in lists an AI tool (`Cursor`, set in `scripts/lib/aggregate.mjs`). Contents are aggregates only:
 
 - Players: count, by cohort, by OS, arcade completion.
 - Per game and mode: round count, flagged count, mean and median words per minute, voice-to-typed ratio distribution, and which mode won per player.
 - Describe to decode: judgments by mode, hit rate by mode, judge count.
 - Rant: accuracy rating distribution by language mix.
 - Explain the snippet: jargon hit rate by mode.
-- Day 3: players with a check-in, players meeting "still using", apps most used.
+- Final check-in (stored as day 3, opens on quest day 2): players with a check-in, players meeting "still using", apps most used.
 - Boss: annoyance distribution, loss-test distribution, pay-intent distribution, the "maybe if" answers listed without code names unless the player allowed quotes.
 - Day 5 follow-up as a separate, labelled block.
 

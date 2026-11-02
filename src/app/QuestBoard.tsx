@@ -6,7 +6,6 @@ import { useSession } from './SessionProvider'
 const QUESTS = [
   'Dictate every prompt you write today.',
   'Reply to one message by voice instead of typing it.',
-  'Write one longer thing, a doc or an email, by dictating it.',
 ]
 const STATUS_LABEL = { done: 'Done', today: 'Today', missed: 'Missed', locked: 'Not yet' } as const
 
@@ -41,7 +40,7 @@ export function QuestBoard() {
         <p className="wa-gain" aria-live="polite">
           {view.streak === 0 ? 'No streak yet' : `${view.streak}-day streak`}
         </p>
-        <ol className="wa-card wa-quests" data-blip-target="quest-board" aria-label="Your three quests">
+        <ol className="wa-card wa-quests" data-blip-target="quest-board" aria-label="Your two quests">
           {view.quests.map((q) => (
             <li key={q.day} className={`wa-quest is-${q.status}`}>
               <span className="wa-quest__day">Day {q.day}</span>
@@ -58,11 +57,11 @@ export function QuestBoard() {
             </button>
           )}
           {view.checkinDue && (
-            <Link to="/check-in" className="wa-btn wa-btn--primary">Do my day 3 check-in</Link>
+            <Link to="/check-in" className="wa-btn wa-btn--primary">Do my day 2 check-in</Link>
           )}
         </div>
         {!view.checkinDue && (
-          <p className="wa-body">Your day 3 check-in opens on day 3. Come back through your personal link.</p>
+          <p className="wa-body">Your day 2 check-in opens on day 2, 24 hours after you finish the arcade. Come back through your personal link.</p>
         )}
       </div>
     </main>

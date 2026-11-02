@@ -1,13 +1,13 @@
 # Voice Arcade
 
-A five-game survey where friends play typed and voice rounds, then try Wispr Flow for three days, so the findings can show what turns "I like Flow" into "I need Flow".
+A five-game survey where friends play typed and voice rounds, then try Wispr Flow for two days, so the findings can show what turns "I like Flow" into "I need Flow".
 
 ## Language
 
 ### People and access
 
 **Player**:
-A friend who plays the arcade and takes part in the three-day experiment.
+A friend who plays the arcade and takes part in the two-day experiment.
 _Avoid_: participant, respondent, user, subject
 
 **Code name**:
@@ -110,7 +110,7 @@ The share of judgments that picked the described scene, compared by mode.
 ### After the arcade
 
 **Quest**:
-A small real-life task for one of the three days, done in the player's own work.
+A small real-life task for one of the two days, done in the player's own work.
 _Avoid_: challenge, mission, homework
 
 **Quest day**:
