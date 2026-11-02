@@ -146,6 +146,7 @@ export function Boss() {
             )}
 
             {failed && <p className="wa-error" role="alert">That did not save. Check your connection and try again.</p>}
+            {!ready && <p className="wa-note" role="status">Answer the three questions above to finish.</p>}
             <div className="wa-actions">
               <button type="submit" className="wa-btn wa-btn--primary" disabled={!ready || busy}>Finish</button>
             </div>

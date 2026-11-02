@@ -221,6 +221,7 @@ export function GameResult() {
                 ))}
               </div>
             </fieldset>
+            {(natural === null || ownership === null) && <p className="wa-note" role="status">Answer both questions to save your result.</p>}
             {failed && <p className="wa-error" role="alert">That did not save. Try again.</p>}
             <div className="wa-actions">
               <button
